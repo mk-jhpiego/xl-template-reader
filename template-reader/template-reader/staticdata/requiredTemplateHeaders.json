@@ -1,0 +1,17 @@
+{ "ProgramArea": "STI", "AgeDisaggregations": ["<1 ",	"1-4 ",	"5-9 ",	"10-14",	"15-19 ",	"20-24",	"25-49 ",	"50+"], "DefaultHandler":"default", "Gender":"both"}
+{ "ProgramArea": "TB", "AgeDisaggregations": ["<1 ",	"1-4 ",	"5-9 ",	"10-14",	"15-19 ",	"20-24",	"25-49 ",	"50+"], "DefaultHandler":"default", "Gender":"both"}
+{ "ProgramArea": "ART", "AgeDisaggregations": ["<1",	"1 – 4",	"5 to 9",	"10 to 14",	"15 to 19",	"20 to 24",	"25 to 49",	"50+"], "DefaultHandler":"default", "Gender":"both"}
+{ "ProgramArea": "PMTCT", "AgeDisaggregations": [], "DefaultHandler":"custom", "Gender":"both"}
+{ "ProgramArea": "Family Planning", "AgeDisaggregations": [], "DefaultHandler":"custom", "Gender":"both"}
+{ "ProgramArea": "Prevention - PWP", "AgeDisaggregations": ["<15",	"15+"], "DefaultHandler":"default", "Gender":"both"}
+{ "ProgramArea": "Clinical Care", "AgeDisaggregations": ["<1",	"1 to 4",	"5 to 9",	"10 to 14",	"15 to 19",	"20 to 24",	"25 to 49",	"50+"], "DefaultHandler":"default", "Gender":"both"}
+{ "ProgramArea": "Support Care ", "AgeDisaggregations": ["<1",	"1-4",	"5-9",	"10-14",	"15-17",	"18+"], "DefaultHandler":"default", "Gender":"both"}
+{ "ProgramArea": "Cancer", "AgeDisaggregations": ["<20",	"20-29",	"30-39",	"40-49",	"50+"], "DefaultHandler":"default", "Gender":"None"}
+{ "ProgramArea": "Prevention-MC", "AgeDisaggregations": ["<1",	"1-9",	"10-14",	"15-19",	"20-24",	"25-29",	"30-49",	"50+"], "DefaultHandler":"default", "Gender":"None"}
+{ "ProgramArea": "Prevention-BCC", "AgeDisaggregations": ["10-14",	"15-19",	"20-24",	" 25-49",	"50+"], "DefaultHandler":"default", "Gender":"both"}
+{ "ProgramArea": "Lab", "AgeDisaggregations": ["TOTAL"], "DefaultHandler":"default", "Gender":"None"}
+{ "ProgramArea": "PEP", "AgeDisaggregations": ["0-9 ",	"10-14 ",	"15-19 ",	"20-24 ",	"25+ "], "DefaultHandler":"default", "Gender":"both"}
+{ "ProgramArea": "Gender", "AgeDisaggregations": ["0-9",	"10– 14",	"15 – 19",	"20 – 24",	"25+"], "DefaultHandler":"default", "Gender":"both"}
+{ "ProgramArea": "SMGL", "AgeDisaggregations": ["<15 years ",	"15-18 years ",	"18+ years "], "DefaultHandler":"default", "Gender":"None"}
+{ "ProgramArea": "Strategic Information (SI)", "AgeDisaggregations": ["Total "], "DefaultHandler":"default", "Gender":"None"}
+{ "ProgramArea": "Pharmacy", "AgeDisaggregations": ["Total Number"], "DefaultHandler":"default", "Gender":"None"}
