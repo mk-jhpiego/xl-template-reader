@@ -32,6 +32,10 @@ namespace template_reader
                     //{
                         //proceed and install
                         var dataImporter = new ReadTemplateValues() { fileName = lblSelectedFile.Text }.DoDataImport();
+                    if (dataImporter.Tables.Count > 0)
+                    {
+                        dataGridView1.DataSource = dataImporter.Tables[0];
+                    }
 
                         //var ds = new ReadTemplateValues() { fileName = lblSelectedFile.Text }.getValues();
                         //dataGridView1.DataSource = ds.Tables[1];

@@ -63,6 +63,8 @@ namespace template_reader
                     }).ToList();
         }
 
+
+
         private DataSet ImportData(Microsoft.Office.Interop.Excel.Application excelApp)
         {
             //we get the facility codes
@@ -74,29 +76,39 @@ namespace template_reader
 
             //for all available program areas, we read the values into an array
             var workbook = excelApp.Workbooks.Open(fileName, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+            //var worksheets = (Worksheets)workbook.Sheets;
+            var worksheetCount = workbook.Sheets.Count;
+            var worksheetNames = new Dictionary<string, string>();
+            for(var indx = 1; indx<= worksheetCount; indx++)
+            {
+                var worksheetName = ((Worksheet)(workbook.Sheets[indx])).Name;
+                worksheetNames.Add(worksheetName.Trim(), worksheetName);
+            }
+
+            var datavalues = new List<model.DataValue>();
+
             foreach (var dataElement in _loadAllProgramDataElements)
             {
-                var xlrange = ((Worksheet)workbook.Sheets[dataElement.ProgramArea]).UsedRange;
+                var xlrange = ((Worksheet)workbook.Sheets[worksheetNames[dataElement.ProgramArea]]).UsedRange;
                 //we scan the first 3 rows for the row with the age groups specified for this program area
-                int rowCount = xlrange.Rows.Count;
-                int colCount = xlrange.Columns.Count;
+                var rowCount = xlrange.Rows.Count;
+                var colCount = xlrange.Columns.Count;
 
                 //we have the column indexes of the first age category options, and other occurrences of the same
                 var firstAgeGroupCell = GetFirstAgeGroupCell(dataElement, xlrange);
 
-                //var rowIndex = firstAgeGroupCell.RowId;
-                //var colmnIndex = firstAgeGroupCell.ColumnId1;
-
                 //Now we find the row indexes of the program indicators
+                ProgramIndicator currentRowMatchingIndicator = null;
                 var firstIndcatorRowIndex = -1;
                 for(var rowIndex = 1; rowIndex <= rowCount; rowIndex++)
                 {
-                    var value = Convert.ToString(xlrange[rowIndex, 1].Value);                    
+                    var value = getCellValue(xlrange, rowIndex, 1);                   
                     if (string.IsNullOrWhiteSpace(value)) continue;
-
-                    if (dataElement.Indicators.Exists(t => t.IndicatorId == value))
+                    var matchingDataElementByIndicatorId = dataElement.Indicators.FirstOrDefault(t => t.IndicatorId == value);
+                    if (matchingDataElementByIndicatorId != null)
                     {
                         firstIndcatorRowIndex = rowIndex;
+                        //currentRowMatchingIndicator = matchingDataElementByIndicatorId;
                         break;
                     }
                 }
@@ -106,42 +118,174 @@ namespace template_reader
                 //we can now start reading these values into an array for each indicator vs age group
                 var tr = 90;
                 //we start reading the values from cell [firstIndcatorRowIndex, firstAgeGroupCell.Colmn1]
+                File.AppendAllText("valuesRead.csv", "Processing: " + dataElement.ProgramArea);
+
                 var testBuilder = new StringBuilder();
-                for (var i = firstIndcatorRowIndex; i <= dataElement.Indicators.Count; i++)
+                testBuilder.AppendLine();
+                testBuilder.AppendLine(dataElement.ProgramArea);
+
+                var countdown = dataElement.Indicators.Count;
+                var i = firstIndcatorRowIndex;
+
+                do
                 {
-                    for (var j = firstAgeGroupCell.ColumnId1; j < dataElement.ServiceAreas.AgeDisaggregations.Count; j++)
+                    var indicatorid = getCellValue(xlrange, i, 1);
+                    if (string.IsNullOrWhiteSpace(indicatorid))
                     {
-                        var value = Convert.ToString(xlrange[i, j].Value);
-                        testBuilder.AppendFormat("{0}\t", value);
+                        throw new ArgumentNullException(string.Format("Expected a value in Cell ( A{0}) for sheet {1}", i, dataElement.ProgramArea));
                     }
+
+                    var j = firstAgeGroupCell.ColumnId1;
+                    var counter = 0;
+
+                    //or we can get the corresponding data element and see what indicators it reports under
+                    while (counter < dataElement.ServiceAreas.AgeDisaggregations.Count)
+                    {
+                        var value = getCellValue(xlrange, i, j);
+                        double asDouble;
+                        try
+                        {
+                            asDouble = value.ToDouble();
+                            if (asDouble == -2146826273 || asDouble == -2146826281)
+                            {
+                                ShowErrorAndAbort(value, indicatorid, dataElement.ProgramArea, i, j);
+                                return null;
+                            }
+                        }
+                        catch
+                        {
+                            ShowErrorAndAbort(value, indicatorid, dataElement.ProgramArea, i, j);
+                            return null;
+                        }
+
+                        if (asDouble != model.Constants.NOVALUE)
+                        {
+                            if (value == null)
+                            {
+                                ShowValueNullErrorAndAbort(indicatorid, dataElement.ProgramArea, i, j);
+                            }
+
+                            datavalues.Add(new DataValue()
+                            {
+                                IndicatorValue = asDouble,
+                                IndicatorId = indicatorid,
+                                ProgramArea = dataElement.ProgramArea,
+                                AgeGroup = dataElement.ServiceAreas.AgeDisaggregations[counter],
+                                Sex = dataElement.ServiceAreas.Gender == "both" ? "Male" : ""
+                            });
+                            testBuilder.AppendFormat("{0}\t", value);
+                        }
+                        else
+                        {
+                            testBuilder.AppendFormat("{0}\t", "x");
+                        }
+
+                        j++;
+
+                        counter++;
+                    }
+
+                    if (dataElement.ServiceAreas.Gender == "both")
+                    {
+                        j = firstAgeGroupCell.ColumnId2;
+
+                        counter = 0;
+                        while (counter < dataElement.ServiceAreas.AgeDisaggregations.Count)
+                        {
+                            var value = getCellValue(xlrange, i, j);
+                            double asDouble;
+                            try
+                            {
+                                asDouble = value.ToDouble();
+                                if (asDouble == -2146826273 || asDouble == -2146826281)
+                                {
+                                    ShowErrorAndAbort(value, indicatorid, dataElement.ProgramArea, i, j);
+                                    return null;
+                                }
+                            }
+                            catch
+                            {
+                                ShowErrorAndAbort(value, indicatorid, dataElement.ProgramArea, i, j);
+                                return null;
+                            }
+
+                            if (asDouble != model.Constants.NOVALUE)
+                            {
+                                if (value == null)
+                                {
+                                    ShowValueNullErrorAndAbort(indicatorid, dataElement.ProgramArea, i, j);
+                                }
+
+                                datavalues.Add(new DataValue()
+                                {
+                                    IndicatorValue = asDouble,
+                                    IndicatorId = indicatorid,
+                                    ProgramArea = dataElement.ProgramArea,
+                                    AgeGroup = dataElement.ServiceAreas.AgeDisaggregations[counter],
+                                    Sex = "Female"
+                                });
+
+                                testBuilder.AppendFormat("{0}\t", value);
+                            }
+                            else
+                            {
+                                testBuilder.AppendFormat("{0}\t", "x");
+                            }
+                            j++;
+                            counter++;
+                        }
+                    }
+
                     testBuilder.AppendLine();
-                }
+                    countdown--;
+                    i++;
+                } while (countdown > 0);
 
                 File.AppendAllText("valuesRead.csv", testBuilder.ToString());
 
-
-                MessageBox.Show("Done");
-
-
-                //xlRange = worksheet.UsedRange;
-
-                //var cols = xlRange.Columns.Count;
-                //var rows = xlRange.Rows.Count;
-
-                //Object arr = xlRange.Value;
-                //var i = 0;
-                //foreach (var s in (Array)arr)
-                //{
-                //    //we show the objects
-                //    var asString = Convert.ToString(s);
-                //    if (string.IsNullOrWhiteSpace(asString))
-                //        continue;
-                //}
+                Console.WriteLine("Done - "+ dataElement.ProgramArea);
             }
             //convert to dataset
+            var ds = new DataSet();
+            var table = new System.Data.DataTable() { TableName = "DataValue" };
+            table.Columns.Add("ProgramArea", typeof(string));
+            table.Columns.Add("IndicatorId", typeof(string));
+            table.Columns.Add("AgeGroup", typeof(string));
+            table.Columns.Add("Sex", typeof(string));
+            table.Columns.Add("IndicatorValue", typeof(double));
+
+            ds.Tables.Add(table);
+
+            foreach(var datavalue in datavalues)
+            {
+                table.Rows.Add(
+                    datavalue.ProgramArea,
+                    datavalue.IndicatorId,
+                    datavalue.AgeGroup,
+                    datavalue.Sex,
+                    datavalue.IndicatorValue
+                    );
+            }
+            table.AcceptChanges();
 
             //and return the value
-            return new DataSet();
+            MessageBox.Show("Done");
+            return ds;
+        }
+
+        static string GetColumnName(int index)
+        {
+            return (index > 26 ? "A" : "") + (index == 0 ? 'A' : Convert.ToChar('A' + index % 26 - 1)).ToString();
+        }
+
+        private void ShowErrorAndAbort(string value, string indicatorid, string programArea, int i, int j)
+        {
+            MessageBox.Show(string.Format("Could not convert value '{0}' in worksheet '{1}' and Cell ({3}{2}) as a number", value, programArea, i, GetColumnName(j)));
+        }
+
+        private void ShowValueNullErrorAndAbort(string indicatorid, string programArea, int i, int j)
+        {
+            MessageBox.Show(string.Format("Could not determine the value in worksheet '{0}' and Cell ({2}{1}). Check that the cells are not merged", programArea, i, GetColumnName(j)));
         }
 
         private static FirstAgeGroupOccurence GetFirstAgeGroupCell(ProgramDataElements dataElement, Range xlrange)
@@ -154,8 +298,8 @@ namespace template_reader
             {
                 for (var colmnId = 1; colmnId <= colCount; colmnId++)
                 {
-                    var value = Convert.ToString(xlrange[rowId, colmnId].Value);
-                    if (string.IsNullOrWhiteSpace(value) || value.Length > 7) continue;
+                    var value = getCellValue(xlrange, rowId, colmnId);
+                    if (string.IsNullOrWhiteSpace(value) || value.Length > 20) continue;
 
                     if (dataElement.ServiceAreas.AgeDisaggregations.Contains(value))
                     {
@@ -166,7 +310,7 @@ namespace template_reader
 
                         if (dataElement.ServiceAreas.Gender == "both")
                         {
-                            //we continue and find the next occurrence of this value
+                            //we continue and find the next occurrence of this value                            
                             colmn2 = findNextOccurence(dataElement, xlrange, colCount, rowId, colmnId + 1, value);
                         }
 
@@ -179,12 +323,19 @@ namespace template_reader
             return new FirstAgeGroupOccurence(row, colmn, colmn2);
         }
 
+        static string getCellValue(Range xlrange, int rowId, int colmnId)
+        {
+            var cellvalue = Convert.ToString(xlrange[rowId, colmnId].Value);
+            return cellvalue == null ? string.Empty : cellvalue.ToString().Trim();
+        }
+
         static int findNextOccurence(ProgramDataElements dataElement, Range xlrange, int colCount, int rowId, int startColmnIndex, string valueToFind)
         {
+            //if(dataElement.ProgramArea =="PEP")
             int colmnIndex = -1;
             for (var colmnId = startColmnIndex; colmnId <= colCount; colmnId++)
             {
-                var value = Convert.ToString(xlrange[rowId, colmnId].Value);
+                var value = getCellValue(xlrange, rowId, colmnId);
                 if (value != valueToFind)
                     continue;
                 colmnIndex = colmnId;
@@ -245,7 +396,7 @@ namespace template_reader
             var builder = new StringBuilder();
             foreach (Worksheet sht in shts)
             {
-                var matchingWorksheets = GetAvailableWorksheetByName(svcs, sht.Name);
+                var matchingWorksheets = GetAvailableWorksheetByName(svcs, sht.Name.Trim());
                 if (matchingWorksheets.Count == 0)
                     continue;
 
@@ -266,7 +417,7 @@ namespace template_reader
                 var arrLength = arr.Length;
                 var colCount = arrLength / ubound;
 
-                var programIndicators = new ProgramAreaIndicators() {ProgramArea = sht.Name };
+                var programIndicators = new ProgramAreaIndicators() {ProgramArea = sht.Name.Trim() };
                 allProgramAreaIndicators.Add(programIndicators);
 
                 var indicatorsByProgramArea = new List<string>();                
@@ -297,39 +448,5 @@ namespace template_reader
         {
             return svcs.FindAll(t => t.ProgramArea == worksheetName);
         }
-
-        //public DataSet getValues()
-        //{
-        //    //https://exceldatareader.codeplex.com/
-        //    var stream = File.Open(fileName, FileMode.Open, FileAccess.Read);
-        //    excel.IExcelDataReader excelReader = null;
-
-        //    if (fileName.EndsWith("xls"))
-        //    {
-        //        //1. Reading from a binary Excel file ('97-2003 format; *.xls)
-        //        excelReader = excel.ExcelReaderFactory.CreateBinaryReader(stream);
-        //    }
-        //    else if (fileName.EndsWith("xlsx"))
-        //    {
-        //        //2. Reading from a OpenXml Excel file (2007 format; *.xlsx)
-        //        excelReader = excel.ExcelReaderFactory.CreateOpenXmlReader(stream);
-        //    }
-            
-        //    //3. DataSet - The result of each spreadsheet will be created in the result.Tables
-        //    var result = excelReader.AsDataSet();
-
-        //    //4. DataSet - Create column names from first row
-        //    excelReader.IsFirstRowAsColumnNames = true;
-
-        //    //5. Data Reader methods
-        //    //while (excelReader.Read())
-        //    //{
-        //    //    excelReader.GetInt32(0);
-        //    //}
-
-        //    //6. Free resources (IExcelDataReader is IDisposable)
-        //    excelReader.Close();
-        //    return result;
-        //}
     }
 }

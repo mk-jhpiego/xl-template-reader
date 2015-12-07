@@ -65,6 +65,7 @@
             this.btnUpdateProgramIndicatorsList.TabIndex = 3;
             this.btnUpdateProgramIndicatorsList.Text = " Update Program Indicators List";
             this.btnUpdateProgramIndicatorsList.UseVisualStyleBackColor = true;
+            this.btnUpdateProgramIndicatorsList.Visible = false;
             this.btnUpdateProgramIndicatorsList.Click += new System.EventHandler(this.btnUpdateProgramIndicatorsList_Click);
             // 
             // btnUpdateProgramAreasList

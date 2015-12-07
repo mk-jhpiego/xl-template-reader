@@ -6,6 +6,15 @@ using System.Threading.Tasks;
 
 namespace template_reader.model
 {
+    public class DataValue
+    {
+        public string ProgramArea { get; set; }
+        public string IndicatorId { get; set; }
+        public double IndicatorValue { get; set; }
+        public string AgeGroup { get; internal set; }
+        public string Sex { get; internal set; }
+    }
+
     public class ProgramDataElements
     {
         public ProgramDataElements()
