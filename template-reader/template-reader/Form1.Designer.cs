@@ -33,16 +33,24 @@
             this.btnUpdateProgramIndicatorsList = new System.Windows.Forms.Button();
             this.btnUpdateProgramAreasList = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.btnSaveToCsv = new System.Windows.Forms.Button();
+            this.btnSaveToServer = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnSelectFileToImport
             // 
-            this.btnSelectFileToImport.Location = new System.Drawing.Point(13, 13);
+            this.btnSelectFileToImport.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSelectFileToImport.Location = new System.Drawing.Point(12, 12);
             this.btnSelectFileToImport.Name = "btnSelectFileToImport";
-            this.btnSelectFileToImport.Size = new System.Drawing.Size(136, 43);
+            this.btnSelectFileToImport.Size = new System.Drawing.Size(95, 52);
             this.btnSelectFileToImport.TabIndex = 0;
-            this.btnSelectFileToImport.Text = "Select fiel to import data";
+            this.btnSelectFileToImport.Text = "Select File to Import";
             this.btnSelectFileToImport.UseVisualStyleBackColor = true;
             this.btnSelectFileToImport.Click += new System.EventHandler(this.btnSelectFileToImport_Click);
             // 
@@ -50,7 +58,7 @@
             // 
             this.lblSelectedFile.AutoSize = true;
             this.lblSelectedFile.ForeColor = System.Drawing.SystemColors.HotTrack;
-            this.lblSelectedFile.Location = new System.Drawing.Point(156, 28);
+            this.lblSelectedFile.Location = new System.Drawing.Point(9, 71);
             this.lblSelectedFile.Name = "lblSelectedFile";
             this.lblSelectedFile.Size = new System.Drawing.Size(80, 13);
             this.lblSelectedFile.TabIndex = 1;
@@ -59,9 +67,9 @@
             // 
             // btnUpdateProgramIndicatorsList
             // 
-            this.btnUpdateProgramIndicatorsList.Location = new System.Drawing.Point(486, 13);
+            this.btnUpdateProgramIndicatorsList.Location = new System.Drawing.Point(586, 12);
             this.btnUpdateProgramIndicatorsList.Name = "btnUpdateProgramIndicatorsList";
-            this.btnUpdateProgramIndicatorsList.Size = new System.Drawing.Size(136, 43);
+            this.btnUpdateProgramIndicatorsList.Size = new System.Drawing.Size(97, 43);
             this.btnUpdateProgramIndicatorsList.TabIndex = 3;
             this.btnUpdateProgramIndicatorsList.Text = " Update Program Indicators List";
             this.btnUpdateProgramIndicatorsList.UseVisualStyleBackColor = true;
@@ -71,9 +79,9 @@
             // btnUpdateProgramAreasList
             // 
             this.btnUpdateProgramAreasList.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.btnUpdateProgramAreasList.Location = new System.Drawing.Point(344, 13);
+            this.btnUpdateProgramAreasList.Location = new System.Drawing.Point(482, 13);
             this.btnUpdateProgramAreasList.Name = "btnUpdateProgramAreasList";
-            this.btnUpdateProgramAreasList.Size = new System.Drawing.Size(136, 43);
+            this.btnUpdateProgramAreasList.Size = new System.Drawing.Size(98, 43);
             this.btnUpdateProgramAreasList.TabIndex = 4;
             this.btnUpdateProgramAreasList.Text = " Update Program Areas List";
             this.btnUpdateProgramAreasList.UseVisualStyleBackColor = false;
@@ -83,26 +91,76 @@
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(1, 62);
+            this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView1.Location = new System.Drawing.Point(0, 0);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(621, 363);
+            this.dataGridView1.Size = new System.Drawing.Size(759, 345);
             this.dataGridView1.TabIndex = 5;
+            // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer1.Name = "splitContainer1";
+            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.btnSaveToCsv);
+            this.splitContainer1.Panel1.Controls.Add(this.btnSaveToServer);
+            this.splitContainer1.Panel1.Controls.Add(this.btnSelectFileToImport);
+            this.splitContainer1.Panel1.Controls.Add(this.lblSelectedFile);
+            this.splitContainer1.Panel1.Controls.Add(this.btnUpdateProgramAreasList);
+            this.splitContainer1.Panel1.Controls.Add(this.btnUpdateProgramIndicatorsList);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.dataGridView1);
+            this.splitContainer1.Size = new System.Drawing.Size(759, 437);
+            this.splitContainer1.SplitterDistance = 88;
+            this.splitContainer1.TabIndex = 6;
+            // 
+            // btnSaveToCsv
+            // 
+            this.btnSaveToCsv.Enabled = false;
+            this.btnSaveToCsv.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSaveToCsv.Location = new System.Drawing.Point(295, 12);
+            this.btnSaveToCsv.Name = "btnSaveToCsv";
+            this.btnSaveToCsv.Size = new System.Drawing.Size(95, 52);
+            this.btnSaveToCsv.TabIndex = 8;
+            this.btnSaveToCsv.Text = "Save as CSV";
+            this.btnSaveToCsv.UseVisualStyleBackColor = true;
+            this.btnSaveToCsv.Click += new System.EventHandler(this.btnSaveToCsv_Click);
+            // 
+            // btnSaveToServer
+            // 
+            this.btnSaveToServer.Enabled = false;
+            this.btnSaveToServer.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSaveToServer.Location = new System.Drawing.Point(181, 12);
+            this.btnSaveToServer.Name = "btnSaveToServer";
+            this.btnSaveToServer.Size = new System.Drawing.Size(95, 52);
+            this.btnSaveToServer.TabIndex = 7;
+            this.btnSaveToServer.Text = "Save to Server";
+            this.btnSaveToServer.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(631, 437);
-            this.Controls.Add(this.dataGridView1);
-            this.Controls.Add(this.btnUpdateProgramAreasList);
-            this.Controls.Add(this.btnUpdateProgramIndicatorsList);
-            this.Controls.Add(this.lblSelectedFile);
-            this.Controls.Add(this.btnSelectFileToImport);
+            this.ClientSize = new System.Drawing.Size(759, 437);
+            this.Controls.Add(this.splitContainer1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Data Importer";
+            this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel1.PerformLayout();
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -113,6 +171,9 @@
         private System.Windows.Forms.Button btnUpdateProgramIndicatorsList;
         private System.Windows.Forms.Button btnUpdateProgramAreasList;
         private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.Button btnSaveToCsv;
+        private System.Windows.Forms.Button btnSaveToServer;
     }
 }
 

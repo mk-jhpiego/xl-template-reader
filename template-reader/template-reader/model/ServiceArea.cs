@@ -6,8 +6,39 @@ using System.Threading.Tasks;
 
 namespace template_reader.model
 {
+    public interface IQueryHelper<T> where T : class
+    {
+        T Execute();
+        IDisplayProgress progressDisplayHelper { get; set; }
+    }
+
+    public interface IDisplayProgress
+    {
+        void PerformProgressStep(string message = "");
+        void MarkStartOfMultipleSteps(int stepsToExpect);
+        void ResetSubProgressIndicator(int stepsToExpect);
+        void PerformSubProgressStep();
+    }
+
+    //public interface ICommandHelper<T> where T : class
+    //{
+    //    void Execute();
+    //}
+
+    public class LocationDetail
+    {
+        public string FacilityName { get; set; }
+        public string ReportMonth { get; set; }
+        public int ReportYear { get; internal set; }
+        //public string ReportYear { get; set; }
+    }
+
     public class DataValue
     {
+        public string FacilityName { get; set; }
+        public int ReportYear { get; set; }
+        public string ReportMonth { get; set; }
+
         public string ProgramArea { get; set; }
         public string IndicatorId { get; set; }
         public double IndicatorValue { get; set; }

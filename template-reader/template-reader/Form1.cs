@@ -6,8 +6,13 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using template_reader.Commands;
+using template_reader.excelProcessing;
+using template_reader.model;
+using template_reader.views;
 
 namespace template_reader
 {
@@ -18,8 +23,19 @@ namespace template_reader
             InitializeComponent();
         }
 
-        private void btnSelectFileToImport_Click(object sender, EventArgs e)
+        void importDataAction()
         {
+            var dataImporter = new GetValuesFromReport() { fileName = lblSelectedFile.Text }.DoDataImport();
+        }
+
+        delegate void refreshDisplay(DataSet ds);
+        CodeRunner<List<DataValue>> _runner;
+
+        volatile List<DataValue> valuesList = null;
+        volatile DataSet valuesDataset = null;
+
+        private void btnSelectFileToImport_Click(object sender, EventArgs e)
+        {            
             var fileName = string.Empty;
             using (var x = new OpenFileDialog() { Filter = "*.xlsx|*.xlsx|*.xls|*.xls", CheckFileExists = true })
             {
@@ -28,24 +44,50 @@ namespace template_reader
                     fileName = x.FileName;
                     lblSelectedFile.Text = fileName;
 
-                    //if (MessageBox.Show("Do you want to conitnue and import the file " + fileName) == DialogResult.OK)
-                    //{
-                        //proceed and install
-                        var dataImporter = new ReadTemplateValues() { fileName = lblSelectedFile.Text }.DoDataImport();
-                    if (dataImporter.Tables.Count > 0)
-                    {
-                        dataGridView1.DataSource = dataImporter.Tables[0];
-                    }
-
-                        //var ds = new ReadTemplateValues() { fileName = lblSelectedFile.Text }.getValues();
-                        //dataGridView1.DataSource = ds.Tables[1];
-                    //}
+                    EnableSaveButtons(false);
+                    valuesList = null;
+                    valuesDataset = null;
                 }
                 else
                 {
                     return;
                 }
             }
+
+            if (!string.IsNullOrWhiteSpace(fileName))
+            {
+                _runner = new CodeRunner<List<DataValue>>()
+                {
+                    ShowSplash = true,
+                    CodeToExcute = new GetValuesFromReport() { fileName = lblSelectedFile.Text },
+                    AsyncCallBack = (q) =>
+                    {
+                        if (q == null)
+                            return;
+
+                        EnableSaveButtons(true);
+
+                        valuesList = q;
+                        valuesDataset = q.ToDataset();
+
+                        if (dataGridView1.InvokeRequired)
+                        {
+                            dataGridView1.Invoke(
+                                new refreshDisplay((s) => { dataGridView1.DataSource = s.Tables[0]; }),
+                                valuesDataset);
+                            return;
+                        }
+                        dataGridView1.DataSource = q.ToDataset().Tables[0];
+                    }
+                };
+                _runner.Execute();
+            }
+        }
+
+        private void EnableSaveButtons(bool controlState)
+        {
+            btnSaveToCsv.EnableControl(controlState);
+            btnSaveToServer.EnableControl(controlState);
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -56,12 +98,22 @@ namespace template_reader
         private void btnUpdateProgramIndicatorsList_Click(object sender, EventArgs e)
         {
             //we update the file ProgramAreaIndicators.txt
-            new ReadTemplateValues() { fileName = lblSelectedFile.Text }.GetValuesReloaded();
+            new GetProgramAreaIndicators().UpdateProgramAreaIndicators();
         }
 
         private void btnUpdateProgramAreasList_Click(object sender, EventArgs e)
         {
             //we update the file requiredTemplateHeaders.json
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            //var programAreaIndicators = new GetProgramAreaIndicators().LoadAllProgramDataElements();
+        }
+
+        private void btnSaveToCsv_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
