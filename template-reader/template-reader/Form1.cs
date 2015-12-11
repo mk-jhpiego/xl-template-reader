@@ -110,10 +110,20 @@ namespace template_reader
         {
             //var programAreaIndicators = new GetProgramAreaIndicators().LoadAllProgramDataElements();
         }
-
         private void btnSaveToCsv_Click(object sender, EventArgs e)
         {
-
+            var fields = new List<string>() { "FacilityName", "ReportYear", "ReportMonth", "ProgramArea", "IndicatorId", "AgeGroup", "Sex", "IndicatorValue" };
+            if (valuesList != null)
+            {
+                using (var writer = new StreamWriter("csvoutput.csv", false))
+                {
+                    writer.WriteLine(string.Format("{0},{1},{2},{3},{4},{5},{6},{7}", "FacilityName", "ReportYear", "ReportMonth", "ProgramArea", "IndicatorId", "AgeGroup", "Sex", "IndicatorValue"));
+                    valuesList.ForEach(t =>
+                    {
+                        writer.WriteLine(string.Format("{0},{1},{2},{3},{4},{5},{6},{7}", t.FacilityName.csvDelim(), t.ReportYear, t.ReportMonth.csvDelim(), t.ProgramArea.csvDelim(), t.IndicatorId.csvDelim(), t.AgeGroup.csvDelim(true), t.Sex.csvDelim(), t.IndicatorValue));
+                    });
+                }
+            }
         }
     }
 }

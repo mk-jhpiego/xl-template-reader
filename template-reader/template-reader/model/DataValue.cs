@@ -52,6 +52,13 @@ namespace template_reader.model
             return double.Parse(asLower);
         }
 
+        public static string csvDelim(this string strValue, bool force = false)
+        {
+            if (force)
+                return "\"" + strValue + "\"";
+            return strValue.Contains(",") ? "\"" + strValue + "\"" : strValue;
+        }
+
         delegate void SetLabelText(string text);
         delegate void SetControlValue(int text);
         delegate void EnableControlDelegate(bool stateToSet);
