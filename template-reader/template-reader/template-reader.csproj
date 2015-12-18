@@ -84,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\CodeRunner.cs" />
+    <Compile Include="database\dbhelper.cs" />
     <Compile Include="excelProcessing\GetProgramAreaIndicators.cs" />
     <Compile Include="excelProcessing\readTemplateValues.cs" />
     <Compile Include="Form1.cs">

@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.IO;
 using System.Windows.Forms;
 using template_reader.Commands;
+using template_reader.database;
 using template_reader.excelProcessing;
 using template_reader.model;
+using System.Linq;
+using System.Text;
 
 namespace template_reader
 {
@@ -112,6 +116,49 @@ namespace template_reader
                     });
                 }
             }
+        }
+
+        private void btnSaveToServer_Click(object sender, EventArgs e)
+        {
+            //we get valuesDataset
+            var ds = valuesDataset;
+            if (ds.Tables.Count == 0)
+            {
+                MessageBox.Show("Nothing to export");
+                return;
+            }
+
+            //initialise db
+            var db = new DbHelper();
+
+            //we copy to server
+            var table = ds.Tables[0];
+
+            var targetTable = "etl_" + Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
+            table.TableName = targetTable;
+
+            //we create the table
+            var builder = new StringBuilder();
+            foreach (DataColumn dc in table.Columns)
+            {
+                builder.AppendFormat("");
+            }
+
+            var res =
+                string.Format("create table {0} ({1})", targetTable,
+                string.Join(",",
+                (
+            from DataColumn dc in table.Columns
+            select dc.ColumnName + " varchar(250)")));
+
+            db.ExecSql(res);
+
+            //use bulkcopy to write table to db
+            db.WriteTableToDb(targetTable, table);
+
+
+            //we save to main table
+            //var copyToPrimaryProc = "";
         }
     }
 }

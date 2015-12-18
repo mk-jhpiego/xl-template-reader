@@ -129,6 +129,7 @@
             this.btnSaveToServer.TabIndex = 7;
             this.btnSaveToServer.Text = "Save to Server";
             this.btnSaveToServer.UseVisualStyleBackColor = true;
+            this.btnSaveToServer.Click += new System.EventHandler(this.btnSaveToServer_Click);
             // 
             // Form1
             // 
