@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using template_reader.model;
 using System.Reflection;
@@ -13,13 +12,14 @@ namespace template_reader.excelProcessing
 {
     public class GetProgramAreaIndicators
     {
-        public void UpdateProgramAreaIndicators()
+        public string UpdateProgramAreaIndicators()
         {
+            var res = string.Empty;
             Microsoft.Office.Interop.Excel.Application excelApp = null;
             try
             {
                 excelApp = new Microsoft.Office.Interop.Excel.Application() { Visible = false };
-                UpdateIndicatorDefinitionsByProgramArea(excelApp);
+                res = UpdateIndicatorDefinitionsByProgramArea(excelApp);
             }
             catch (Exception ex)
             {
@@ -32,6 +32,7 @@ namespace template_reader.excelProcessing
                     excelApp.Quit();
                 }
             }
+            return res;
         }
 
         private static List<ServiceAreaDataset> GetAvailableWorksheetByName(List<ServiceAreaDataset> svcs, string worksheetName)
@@ -39,8 +40,13 @@ namespace template_reader.excelProcessing
             return svcs.FindAll(t => t.ProgramArea == worksheetName);
         }
 
-        private void UpdateIndicatorDefinitionsByProgramArea(Microsoft.Office.Interop.Excel.Application excelApp)
+        List<string> maleFemaleIndicators = new List<string>() { "STI", "TB", "ART", "Family Planning", "Prevention - PWP", "Clinical Care" };
+
+        List<string> singleGenderIndicators = new List<string>() { "PMTCT", "Prevention-MC" };
+
+        private string UpdateIndicatorDefinitionsByProgramArea(Microsoft.Office.Interop.Excel.Application excelApp)
         {
+            var res = string.Empty;
             //http://stackoverflow.com/questions/16213255/how-to-read-cell-values-from-existing-excel-file
             var relativePath = "staticdata//sampleTemplate.xlsx";
             var filePath = string.Empty;
@@ -59,85 +65,81 @@ namespace template_reader.excelProcessing
             var shts = wb.Sheets;
             var sheetsToSkip = new[] { "Narrative", "Appendix 1", "Cover1" };
 
-            //we get the list of available modules
-            var svcAreas = File.ReadAllLines("staticdata//requiredTemplateHeaders.json");
-            var svcs = (from svc in svcAreas
-                        select Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceAreaDataset>(svc)).ToList();
-
-            var allProgramAreaIndicators = new List<ProgramAreaIndicators>();
-            var builder = new StringBuilder();
+            var programAreaDefinitions = new List<ProgramAreaDefinition>();
             foreach (Worksheet sht in shts)
             {
-                var matchingWorksheets = GetAvailableWorksheetByName(svcs, sht.Name.Trim());
-                if (matchingWorksheets.Count == 0)
+                var usedRange = sht.UsedRange;
+                var rows = usedRange.Rows.Count;
+                var colmns = usedRange.Columns.Count;
+
+                var programAreaName = sht.Name.Trim();
+
+                if (sheetsToSkip.Contains(programAreaName))
                     continue;
 
-                var first = matchingWorksheets.First();
-                if (first.DefaultHandler == "custom")
+                var programAreaDefinition = new ProgramAreaDefinition() { ProgramArea = programAreaName };
+                programAreaDefinitions.Add(programAreaDefinition);
+
+                if(maleFemaleIndicators.Contains(programAreaName))
+                    programAreaDefinition.Gender = "both";
+                else if (singleGenderIndicators.Contains(programAreaName))
                 {
-                    //for now, we skip PMTCT and Family Planning
-                    continue;
+                    programAreaDefinition.Gender = "none";
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException(
+                        string.Format("Error. Gender categorization of {0} not defined", programAreaName));
                 }
 
-                var xlRange = sht.UsedRange;
-                var arrayObj = xlRange.Value;
-
-                var arr = (Array)xlRange.Value;
-
-                var lbound = arr.GetLowerBound(0);
-                var ubound = arr.GetUpperBound(0);
-                var arrLength = arr.Length;
-                var colCount = arrLength / ubound;
-
-                var programIndicators = new ProgramAreaIndicators() { ProgramArea = sht.Name.Trim() };
-                allProgramAreaIndicators.Add(programIndicators);
-
-                var indicatorsByProgramArea = new List<string>();
-                for (var i = 1; i <= ubound; i++)
+                if (programAreaName == "Family Planning")
                 {
-                    if (i == 1) continue;
+                    programAreaDefinition.DefaultHandler = "Custom";
+                }
 
-                    var indicatorCode = string.Empty;
-                    var indicatorName = string.Empty;
-                    indicatorCode = Convert.ToString(arr.GetValue(i, 1));
-                    indicatorName = Convert.ToString(arr.GetValue(i, 2));
-                    if (string.IsNullOrWhiteSpace(indicatorCode) || string.IsNullOrWhiteSpace(indicatorName))
+                //we get the indicator codes and names. These are in the first and second columns starting from the second row
+                for (var i = 2; i < rows; i++)
+                {
+                    var indicatorCode = GetValuesFromReport.getCellValue(usedRange, i, 1);
+                    var indicatorName = GetValuesFromReport.getCellValue(usedRange, i, 2);
+                    programAreaDefinition.Indicators.Add(new ProgramIndicator()
+                    {
+                        IndicatorId = indicatorCode,
+                        Indicator = indicatorName
+                    });
+                }
+
+                //we get the agegroup categories
+                for (var j = 3; j < colmns; j++)
+                {
+                    var ageGroupLabel = GetValuesFromReport.getCellValue(usedRange, 2, j);
+                    if (string.IsNullOrWhiteSpace(ageGroupLabel))
                         continue;
 
-                    programIndicators.Indicators.Add(new ProgramIndicator() { Indicator = indicatorName, IndicatorId = indicatorCode });
+                    programAreaDefinition.AgeDisaggregations.Add(ageGroupLabel);
                 }
-                builder.AppendLine(Newtonsoft.Json.JsonConvert.SerializeObject(programIndicators));
             }
 
-            if (File.Exists("ProgramAreaIndicators.txt"))
-                File.Delete("ProgramAreaIndicators.txt");
-            File.AppendAllText("ProgramAreaIndicators.txt", builder.ToString());
+            //we save the data
+            if (File.Exists("ProgramAreaDefinitions.json"))
+                File.Delete("ProgramAreaDefinitions.json");
+
+            var builder = new StringBuilder();
+            programAreaDefinitions.ForEach(t => builder.AppendLine(Newtonsoft.Json.JsonConvert.SerializeObject(t)));
+            res = builder.ToString();
+
+            File.AppendAllText("ProgramAreaDefinitions.json", res);
 
             MessageBox.Show("Done");
+            return res;
         }
 
-        public List<ProgramDataElements> GetAllProgramDataElements()
+        public List<ProgramAreaDefinition> GetAllProgramDataElements()
         {
-            //we get the available program areas
-            var svcAreas = File.ReadAllLines("staticdata//requiredTemplateHeaders.json");
-            var allServiceAreas = (from svc in svcAreas
-                                   select Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceAreaDataset>(svc)).ToList();
-
             //we get the avilable indicators by program area
-            var progAreas = File.ReadAllLines("staticdata//programAreaIndicators.json");
-            var programAreaInidcators = (from progArea in progAreas
-                                         select Newtonsoft.Json.JsonConvert.DeserializeObject<ProgramAreaIndicators>(progArea)).ToList();
-
-            return (from pi in programAreaInidcators
-                    let sarea = allServiceAreas.Where(t => t.ProgramArea == pi.ProgramArea).FirstOrDefault()
-                    where sarea != null
-                    select new ProgramDataElements()
-                    {
-                        ProgramArea = pi.ProgramArea,
-                        Indicators = pi.Indicators,
-                        ServiceAreas = sarea
-                    }).ToList();
+            var progAreas = File.ReadAllLines("staticdata//ProgramAreaDefinitions.json");
+            return (from progArea in progAreas
+                                         select Newtonsoft.Json.JsonConvert.DeserializeObject<ProgramAreaDefinition>(progArea)).ToList();
         }
-
     }
 }

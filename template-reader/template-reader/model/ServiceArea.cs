@@ -46,18 +46,26 @@ namespace template_reader.model
         public string Sex { get; internal set; }
     }
 
-    public class ProgramDataElements
+    public class ProgramAreaDefinition
     {
-        public ProgramDataElements()
+        public ProgramAreaDefinition()
         {
             ProgramArea = string.Empty;
-            ServiceAreas = new ServiceAreaDataset();
+            //ServiceAreas = new ServiceAreaDataset();
             Indicators = new List<ProgramIndicator>();
+            AgeDisaggregations = new List<string>();
+
+            DefaultHandler = "default";
+            Gender = string.Empty;
         }
 
-        public ServiceAreaDataset ServiceAreas { get; set; }
+        //public ServiceAreaDataset ServiceAreas { get; set; }
         public string ProgramArea { get; set; }
         public List<ProgramIndicator> Indicators { get; set; }
+        public List<string> AgeDisaggregations { get; set; }
+
+        public string DefaultHandler { get; set; }
+        public string Gender { get; set; }
     }
 
     public class ServiceAreaDataset

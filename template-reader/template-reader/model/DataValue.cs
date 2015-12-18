@@ -80,6 +80,7 @@ namespace template_reader.model
             }
             control.Value = text;
         }
+
         public static void SetStepValue(this ProgressBar control, int text)
         {
             if (control.InvokeRequired)
@@ -100,6 +101,7 @@ namespace template_reader.model
             control.Enabled = newState;
         }
     }
+
     public class Constants
     {
         public const double NOVALUE = -999999;

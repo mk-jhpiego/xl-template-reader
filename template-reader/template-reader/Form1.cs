@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using template_reader.Commands;
 using template_reader.excelProcessing;
 using template_reader.model;
-using template_reader.views;
 
 namespace template_reader
 {
@@ -98,18 +91,13 @@ namespace template_reader
         private void btnUpdateProgramIndicatorsList_Click(object sender, EventArgs e)
         {
             //we update the file ProgramAreaIndicators.txt
-            new GetProgramAreaIndicators().UpdateProgramAreaIndicators();
+            var res = new GetProgramAreaIndicators().UpdateProgramAreaIndicators();
+            splitContainer1.Panel2.Controls.Clear();
+            var rtb = new RichTextBox() { Dock = DockStyle.Fill };
+            splitContainer1.Panel2.Controls.Add(rtb);
+            rtb.Text = res;
         }
 
-        private void btnUpdateProgramAreasList_Click(object sender, EventArgs e)
-        {
-            //we update the file requiredTemplateHeaders.json
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            //var programAreaIndicators = new GetProgramAreaIndicators().LoadAllProgramDataElements();
-        }
         private void btnSaveToCsv_Click(object sender, EventArgs e)
         {
             var fields = new List<string>() { "FacilityName", "ReportYear", "ReportMonth", "ProgramArea", "IndicatorId", "AgeGroup", "Sex", "IndicatorValue" };

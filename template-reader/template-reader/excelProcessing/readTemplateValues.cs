@@ -3,12 +3,9 @@ using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using template_reader.model;
 //using excel = Excel;
@@ -21,7 +18,7 @@ namespace template_reader.excelProcessing
 
         public IDisplayProgress progressDisplayHelper { get; set; }
 
-        List<ProgramDataElements> _loadAllProgramDataElements;
+        List<ProgramAreaDefinition> _loadAllProgramDataElements;
 
         public List<DataValue> Execute()
         {
@@ -289,9 +286,9 @@ namespace template_reader.excelProcessing
                     var counter = 0;
 
                     //or we can get the corresponding data element and see what indicators it reports under
-                    while (counter < dataElement.ServiceAreas.AgeDisaggregations.Count)
+                    while (counter < dataElement.AgeDisaggregations.Count)
                     {
-                        while (counter < dataElement.ServiceAreas.AgeDisaggregations.Count)
+                        while (counter < dataElement.AgeDisaggregations.Count)
                         {
                             var dataValue = GetDataValue(
                                 xlRange: xlrange,
@@ -300,7 +297,7 @@ namespace template_reader.excelProcessing
                                 rowId: i,
                                 colmnId: j,
                                 counter: counter,
-                                sex: dataElement.ServiceAreas.Gender == "both" ? "Male" : "",
+                                sex: dataElement.Gender == "both" ? "Male" : "",
                                 builder: testBuilder
                                 );
                             if (dataValue != null)
@@ -312,11 +309,11 @@ namespace template_reader.excelProcessing
                         counter++;
                     }
 
-                    if (dataElement.ServiceAreas.Gender == "both")
+                    if (dataElement.Gender == "both")
                     {
                         j = firstAgeGroupCell.ColumnId2;
                         counter = 0;
-                        while (counter < dataElement.ServiceAreas.AgeDisaggregations.Count)
+                        while (counter < dataElement.AgeDisaggregations.Count)
                         {
                             var dataValue = GetDataValue(
                                 xlRange: xlrange,
@@ -356,7 +353,7 @@ namespace template_reader.excelProcessing
             return datavalues;
         }
 
-        private DataValue GetDataValue(Range xlRange, ProgramDataElements dataElement, string indicatorid, int rowId, int colmnId, int counter, string sex, StringBuilder builder=null )
+        private DataValue GetDataValue(Range xlRange, ProgramAreaDefinition dataElement, string indicatorid, int rowId, int colmnId, int counter, string sex, StringBuilder builder=null )
         {
             var i = rowId;
             var j = colmnId;
@@ -390,7 +387,7 @@ namespace template_reader.excelProcessing
                     IndicatorValue = asDouble,
                     IndicatorId = indicatorid,
                     ProgramArea = dataElement.ProgramArea,
-                    AgeGroup = dataElement.ServiceAreas.AgeDisaggregations[counter],
+                    AgeGroup = dataElement.AgeDisaggregations[counter],
                     Sex = sex
                 };
                 if (builder != null)
@@ -420,21 +417,34 @@ namespace template_reader.excelProcessing
             return (index > 26 ? "A" : "") + (index == 0 ? 'A' : Convert.ToChar('A' + index % 26 - 1)).ToString();
         }
 
+        static bool _showSimilarMessages = true;
         private void ShowErrorAndAbort(string value, string indicatorid, string programArea, int i, int j, bool throwException = false)
         {
+            if (!_showSimilarMessages) return;
+
             if (throwException)
             {
                 throw new ArgumentException(string.Format("Could not convert value '{0}' in worksheet '{1}' and Cell ({3}{2}) as a number", value, programArea, i, GetColumnName(j)));
             };
-            MessageBox.Show(string.Format("Could not convert value '{0}' in worksheet '{1}' and Cell ({3}{2}) as a number", value, programArea, i, GetColumnName(j)));
+            var res = MessageBox.Show(string.Format("Could not convert value '{0}' in worksheet '{1}' and Cell ({3}{2}) as a number. \nDo you want to see other similar messages", value, programArea, i, GetColumnName(j)),"Error getting value. The tool will quit.",MessageBoxButtons.YesNo);
+            if(res != DialogResult.No)
+            {
+                _showSimilarMessages = false;
+            }
         }
 
         private void ShowValueNullErrorAndAbort(string indicatorid, string programArea, int i, int j)
         {
-            MessageBox.Show(string.Format("Could not determine the value in worksheet '{0}' and Cell ({2}{1}). Check that the cells are not merged", programArea, i, GetColumnName(j)));
+            if (!_showSimilarMessages) return;
+
+            var res = MessageBox.Show(string.Format("Could not determine the value in worksheet '{0}' and Cell ({2}{1}). Check that the cells are not merged", programArea, i, GetColumnName(j)), "Error getting value. The tool will quit.", MessageBoxButtons.YesNo);
+            if (res == DialogResult.No)
+            {
+                _showSimilarMessages = false;
+            }
         }
 
-        private static FirstAgeGroupOccurence GetFirstAgeGroupCell(ProgramDataElements dataElement, Range xlrange)
+        private static FirstAgeGroupOccurence GetFirstAgeGroupCell(ProgramAreaDefinition dataElement, Range xlrange)
         {
             int colCount = xlrange.Columns.Count;
             int row = -1, colmn = -1, colmn2 = -1;
@@ -447,14 +457,14 @@ namespace template_reader.excelProcessing
                     var value = getCellValue(xlrange, rowId, colmnId);
                     if (string.IsNullOrWhiteSpace(value) || value.Length > 20) continue;
 
-                    if (dataElement.ServiceAreas.AgeDisaggregations.Contains(value))
+                    if (dataElement.AgeDisaggregations.Contains(value))
                     {
                         //we've found our row
                         row = rowId;
                         colmn = colmnId;
                         matchfound = true;
 
-                        if (dataElement.ServiceAreas.Gender == "both")
+                        if (dataElement.Gender.ToLowerInvariant() == "both")
                         {
                             //we continue and find the next occurrence of this value                            
                             colmn2 = findNextOccurence(dataElement, xlrange, colCount, rowId, colmnId + 1, value);
@@ -469,13 +479,13 @@ namespace template_reader.excelProcessing
             return new FirstAgeGroupOccurence(row, colmn, colmn2);
         }
 
-        static string getCellValue(Range xlrange, int rowId, int colmnId)
+        public static string getCellValue(Range xlrange, int rowId, int colmnId)
         {
             var cellvalue = Convert.ToString(xlrange[rowId, colmnId].Value);
             return cellvalue == null ? string.Empty : cellvalue.ToString().Trim();
         }
 
-        static int findNextOccurence(ProgramDataElements dataElement, Range xlrange, int colCount, int rowId, int startColmnIndex, string valueToFind)
+        static int findNextOccurence(ProgramAreaDefinition dataElement, Range xlrange, int colCount, int rowId, int startColmnIndex, string valueToFind)
         {
             //if(dataElement.ProgramArea =="PEP")
             int colmnIndex = -1;
