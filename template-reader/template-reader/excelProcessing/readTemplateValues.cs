@@ -353,6 +353,7 @@ namespace template_reader.excelProcessing
             return datavalues;
         }
 
+        static List<string> customHandledIndicators = new List<string>() { "FP4", "FP6", "FP7" };
         private DataValue GetDataValue(Range xlRange, ProgramAreaDefinition dataElement, string indicatorid, int rowId, int colmnId, int counter, string sex, StringBuilder builder=null )
         {
             var i = rowId;
@@ -360,6 +361,10 @@ namespace template_reader.excelProcessing
             var value = getCellValue(xlRange, i, j);
             double asDouble;
             DataValue dataValue = null;
+
+            if (customHandledIndicators.Contains(indicatorid))
+                return null;
+
             try
             {
                 asDouble = value.ToDouble();
@@ -393,7 +398,6 @@ namespace template_reader.excelProcessing
                 if (builder != null)
                 {
                     LogCsvOutput(string.Format("{0}\t", value));
-                    //builder.AppendFormat("{0}\t", value);
                 }
             }
             else

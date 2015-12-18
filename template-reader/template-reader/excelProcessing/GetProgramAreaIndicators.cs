@@ -96,12 +96,15 @@ namespace template_reader.excelProcessing
                 {
                     programAreaDefinition.DefaultHandler = "Custom";
                 }
-
+                //Prevention - PWP    programAreaName=="Prevention - PWP"
                 //we get the indicator codes and names. These are in the first and second columns starting from the second row
-                for (var i = 2; i < rows; i++)
+                for (var i = 2; i <= rows; i++)
                 {
                     var indicatorCode = GetValuesFromReport.getCellValue(usedRange, i, 1);
                     var indicatorName = GetValuesFromReport.getCellValue(usedRange, i, 2);
+                    if (string.IsNullOrWhiteSpace(indicatorCode) || string.IsNullOrWhiteSpace(indicatorName))
+                        continue;
+
                     programAreaDefinition.Indicators.Add(new ProgramIndicator()
                     {
                         IndicatorId = indicatorCode,
@@ -110,7 +113,7 @@ namespace template_reader.excelProcessing
                 }
 
                 //we get the agegroup categories
-                for (var j = 3; j < colmns; j++)
+                for (var j = 3; j <= colmns; j++)
                 {
                     var ageGroupLabel = GetValuesFromReport.getCellValue(usedRange, 2, j);
                     if (string.IsNullOrWhiteSpace(ageGroupLabel))
