@@ -10,6 +10,7 @@ using template_reader.excelProcessing;
 using template_reader.model;
 using System.Linq;
 using System.Text;
+using System.Transactions;
 
 namespace template_reader
 {
@@ -94,7 +95,8 @@ namespace template_reader
 
         private void btnUpdateProgramIndicatorsList_Click(object sender, EventArgs e)
         {
-            //we update the file ProgramAreaIndicators.txt
+            //Output written to the file ProgramAreaDefinitions.json in the same folder where app will run from
+            //copy contents into the file staticdata/ProgramAreaDefinitions.json and restart app
             var res = new GetProgramAreaIndicators().UpdateProgramAreaIndicators();
             splitContainer1.Panel2.Controls.Clear();
             var rtb = new RichTextBox() { Dock = DockStyle.Fill };
@@ -102,6 +104,7 @@ namespace template_reader
             rtb.Text = res;
         }
 
+        static List<string> fields = new List<string>() { "FacilityName", "ReportYear", "ReportMonth", "ProgramArea", "IndicatorId", "AgeGroup", "Sex", "IndicatorValue" };
         private void btnSaveToCsv_Click(object sender, EventArgs e)
         {
             var fields = new List<string>() { "FacilityName", "ReportYear", "ReportMonth", "ProgramArea", "IndicatorId", "AgeGroup", "Sex", "IndicatorValue" };
@@ -127,38 +130,20 @@ namespace template_reader
                 MessageBox.Show("Nothing to export");
                 return;
             }
+            var tempTableName = new RandomTableNameGenerator().Execute();
+            valuesDataset.Tables[0].TableName = tempTableName;
 
-            //initialise db
-            var db = new DbHelper();
+            var dataImporter = new SaveTableToDbCommand() { TargetDataset = valuesDataset };
+            dataImporter.Execute();
 
-            //we copy to server
-            var table = ds.Tables[0];
+            //we start the merge
+            var dataMerge = new DataMergeCommand() {
+                DatabaseHelper = new DbHelper(),
+                TempTableName = tempTableName, DestinationTable = "FacilityData" };
+            dataMerge.Execute();
 
-            var targetTable = "etl_" + Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
-            table.TableName = targetTable;
-
-            //we create the table
-            var builder = new StringBuilder();
-            foreach (DataColumn dc in table.Columns)
-            {
-                builder.AppendFormat("");
-            }
-
-            var res =
-                string.Format("create table {0} ({1})", targetTable,
-                string.Join(",",
-                (
-            from DataColumn dc in table.Columns
-            select dc.ColumnName + " varchar(250)")));
-
-            db.ExecSql(res);
-
-            //use bulkcopy to write table to db
-            db.WriteTableToDb(targetTable, table);
-
-
-            //we save to main table
-            //var copyToPrimaryProc = "";
+            EnableSaveButtons(false);
+            MessageBox.Show("Merge completed");
         }
     }
 }

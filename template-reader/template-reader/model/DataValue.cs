@@ -9,8 +9,6 @@ using System.Windows.Forms;
 
 namespace template_reader.model
 {
-
-
     public static class MyExtensions
     {
         public static DataSet ToDataset(this List<DataValue> dataValues)

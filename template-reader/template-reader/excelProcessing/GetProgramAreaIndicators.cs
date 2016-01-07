@@ -42,7 +42,8 @@ namespace template_reader.excelProcessing
 
         List<string> maleFemaleIndicators = new List<string>() { "STI", "TB", "ART", "Family Planning", "Prevention - PWP", "Clinical Care" };
 
-        List<string> singleGenderIndicators = new List<string>() { "PMTCT", "Prevention-MC" };
+        Dictionary<string, string> singleGenderIndicators = new Dictionary<string, string>(){
+            {"PMTCT","Female"  },            { "Prevention-MC" ,"Male"}            };
 
         private string UpdateIndicatorDefinitionsByProgramArea(Microsoft.Office.Interop.Excel.Application excelApp)
         {
@@ -80,16 +81,19 @@ namespace template_reader.excelProcessing
                 var programAreaDefinition = new ProgramAreaDefinition() { ProgramArea = programAreaName };
                 programAreaDefinitions.Add(programAreaDefinition);
 
-                if(maleFemaleIndicators.Contains(programAreaName))
+                if (maleFemaleIndicators.Contains(programAreaName))
                     programAreaDefinition.Gender = "both";
-                else if (singleGenderIndicators.Contains(programAreaName))
-                {
-                    programAreaDefinition.Gender = "none";
-                }
                 else
                 {
-                    throw new ArgumentOutOfRangeException(
-                        string.Format("Error. Gender categorization of {0} not defined", programAreaName));
+                    var gender = string.Empty;
+                    if (singleGenderIndicators.TryGetValue(programAreaName, out gender))
+                    {
+                        programAreaDefinition.Gender = gender;
+                    }
+                    else
+                    {
+                        throw new ArgumentOutOfRangeException(string.Format("Error. Gender categorization of {0} not defined", programAreaName));
+                    }
                 }
 
                 if (programAreaName == "Family Planning")
@@ -132,6 +136,26 @@ namespace template_reader.excelProcessing
             res = builder.ToString();
 
             File.AppendAllText("ProgramAreaDefinitions.json", res);
+
+
+            if (File.Exists("IndicatorDefinitions.csv"))
+                File.Delete("IndicatorDefinitions.csv");
+
+            var fields = new List<string>() { "ProgramArea", "IndicatorCode", "Indicator" };
+            using (var writer = new StreamWriter("IndicatorDefinitions.csv", false))
+            {
+                writer.WriteLine(string.Format("{0},{1},{2}", "ProgramArea", "IndicatorCode", "Indicator"));
+                programAreaDefinitions.ForEach(programArea =>
+                    {
+                        programArea.Indicators.ForEach(
+                            indicator =>
+                        writer.WriteLine(string.Format("{0},{1},{2}",
+                        programArea.ProgramArea.csvDelim(),
+                        indicator.IndicatorId.csvDelim(),
+                        indicator.Indicator.csvDelim()))
+                        );
+                    });
+            } 
 
             MessageBox.Show("Done");
             return res;

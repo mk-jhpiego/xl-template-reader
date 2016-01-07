@@ -27,12 +27,16 @@ namespace template_reader.excelProcessing
 
         public List<DataValue> DoDataImport()
         {
+            _showSimilarMessages = true;
             List<DataValue> toReturn = null;
             Microsoft.Office.Interop.Excel.Application excelApp = null;
             try
             {
                 excelApp = new Microsoft.Office.Interop.Excel.Application() { Visible = false };
-                toReturn = ImportData(excelApp);
+                var res = ImportData(excelApp);
+                if (IsInError)
+                    return null;
+                toReturn = res;
             }
             catch (Exception ex)
             {
@@ -102,14 +106,24 @@ namespace template_reader.excelProcessing
                 var lowerFieldValue = fieldValue.ToLowerInvariant().Trim();
 
                 if (lowerFieldName == healthFacilityLabel)
-                    locationDetail.FacilityName = fieldValue.Trim();
+                {
+                    var split = fieldValue.Trim().Split(new[] { '>' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (split.Length == 2)
+                    {
+                        locationDetail.FacilityName = split[1];
+                    }
+                    else
+                    {
+                        locationDetail.FacilityName = string.Empty;
+                    }   
+                }
                 else if (lowerFieldName == reportMonth)
                     locationDetail.ReportMonth = fieldValue.Trim();
                 else if (lowerFieldName == reportYear)
                 {
                     yearfound = true;
                     int year = -1;
-                    if(!int.TryParse(fieldValue.Trim(), out year))
+                    if (!int.TryParse(fieldValue.Trim(), out year))
                     {
                         ShowErrorAndAbort(fieldValue, "Year Reported on", coverWorksheetName, i, 4, true);
                         //throw new ArgumentException("Error converting value " + fieldValue + " as a number");
@@ -194,6 +208,13 @@ namespace template_reader.excelProcessing
         void LogCsvOutput(string text)
         {
             //File.AppendAllText("valuesRead.csv", text);
+        }
+
+        string getGenderText(string genderName)
+        {
+            var t= genderName == "both" ? "Male" :
+                                (genderName == "Male" || genderName == "Female" ? genderName : "");
+            return t;
         }
 
         object initProgDatElmts = new object();
@@ -297,7 +318,9 @@ namespace template_reader.excelProcessing
                                 rowId: i,
                                 colmnId: j,
                                 counter: counter,
-                                sex: dataElement.Gender == "both" ? "Male" : "",
+                                sex: getGenderText(dataElement.Gender) ,
+                                //dataElement.Gender == "both" ? "Male" :
+                                //(dataElement.Gender == "Male" || dataElement.Gender == "Female" ? dataElement.Gender : ""),
                                 builder: testBuilder
                                 );
                             if (dataValue != null)
@@ -320,7 +343,7 @@ namespace template_reader.excelProcessing
                                 dataElement: dataElement, indicatorid: indicatorid,
                                 rowId: i, colmnId: j,
                                 counter: counter,
-                                sex: "Female",
+                                sex: getGenderText("Female") ,
                                 builder: testBuilder
                                 );
                             if (dataValue != null)
@@ -413,6 +436,7 @@ namespace template_reader.excelProcessing
 
         private void ShowMissingWorksheet(string coverWorksheetName)
         {
+            IsInError = true;
             MessageBox.Show("Error trying to access the worksheet "+ coverWorksheetName);
         }
 
@@ -420,10 +444,11 @@ namespace template_reader.excelProcessing
         {
             return (index > 26 ? "A" : "") + (index == 0 ? 'A' : Convert.ToChar('A' + index % 26 - 1)).ToString();
         }
-
+        bool IsInError = false;
         static bool _showSimilarMessages = true;
         private void ShowErrorAndAbort(string value, string indicatorid, string programArea, int i, int j, bool throwException = false)
         {
+            IsInError = true;
             if (!_showSimilarMessages) return;
 
             if (throwException)
@@ -431,7 +456,7 @@ namespace template_reader.excelProcessing
                 throw new ArgumentException(string.Format("Could not convert value '{0}' in worksheet '{1}' and Cell ({3}{2}) as a number", value, programArea, i, GetColumnName(j)));
             };
             var res = MessageBox.Show(string.Format("Could not convert value '{0}' in worksheet '{1}' and Cell ({3}{2}) as a number. \nDo you want to see other similar messages", value, programArea, i, GetColumnName(j)),"Error getting value. The tool will quit.",MessageBoxButtons.YesNo);
-            if(res != DialogResult.No)
+            if(res != DialogResult.Yes)
             {
                 _showSimilarMessages = false;
             }
@@ -439,10 +464,11 @@ namespace template_reader.excelProcessing
 
         private void ShowValueNullErrorAndAbort(string indicatorid, string programArea, int i, int j)
         {
+            IsInError = true;
             if (!_showSimilarMessages) return;
 
             var res = MessageBox.Show(string.Format("Could not determine the value in worksheet '{0}' and Cell ({2}{1}). Check that the cells are not merged", programArea, i, GetColumnName(j)), "Error getting value. The tool will quit.", MessageBoxButtons.YesNo);
-            if (res == DialogResult.No)
+            if (res != DialogResult.Yes)
             {
                 _showSimilarMessages = false;
             }
