@@ -55,7 +55,7 @@ namespace template_reader.Commands
 
                 transaction.Complete();
             }
-            MessageBox.Show("Records imported " + recordsImported);
+            //MessageBox.Show("Records will be imported " + recordsImported);
             return new List<string>();
         }
     }

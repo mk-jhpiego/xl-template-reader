@@ -56,12 +56,12 @@ a.AgeGroupId,
 IndicatorValue Value
 into {1}
  From {0} d
- join FacilityLookUp f on d.FacilityName = f.FacilityID
+ join FacilityLookUp f on d.FacilityName = rtrim(ltrim(f.FacilityID))
  join YearLookUp y on d.ReportYear = y.YearName
  join MonthLookUp m on d.ReportMonth = m.MonthName
  join AgeGroupLookupAlternate a on d.AgeGroup = a.AgeGroup
  join GenderLookUp g on d.Sex = g.GenderLongName
- join [dbo].[IndicatorLookup] il on d.IndicatorId = il.IndicatorId; truncate table {0}
+ join [dbo].[IndicatorLookup] il on d.IndicatorId = il.IndicatorId
 ";
             DatabaseHelper.ExecSql(string.Format(sql, TempTableName, newTempTableName));
 

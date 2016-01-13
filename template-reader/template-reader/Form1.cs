@@ -142,8 +142,8 @@ namespace template_reader
                 TempTableName = tempTableName, DestinationTable = "FacilityData" };
             dataMerge.Execute();
 
-            EnableSaveButtons(false);
-            MessageBox.Show("Merge completed");
+            EnableSaveButtons(false);            
+            //MessageBox.Show("Merge completed");
         }
     }
 }
