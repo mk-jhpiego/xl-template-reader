@@ -5,20 +5,84 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using template_reader.model;
 
 namespace template_reader.database
 {
+    public class ConnectionBuilder
+    {
+        //static string connString = @"Data Source = D-5932S32\SQLEXPRESS; Initial Catalog = JhpiegoDb; Integrated Security = true";
+        static string connStringX = @"Data Source = {0}\{1}; Initial Catalog = {2}; Integrated Security = true";
+
+        public string GetConnectionString()
+        {
+            return string.Format(connStringX, ServerName, InstanceName, DatabaseName);
+        }
+        public string ServerName { get; set; }
+        public string InstanceName { get; set; }
+
+        internal bool IsValid()
+        {
+            return true;
+        }
+
+        public string DatabaseName { get; set; }
+        //public bool IntegratedSecurity { get; set; }
+        //public string UserName { get; set; }
+        //public string Password { get; set; }
+    }
+
     public class DbHelper
     {
-        static string connString = @"Data Source = D-5932S32\SQLEXPRESS; Initial Catalog = JhpiegoDb; Integrated Security = true";
-        public SqlConnection GetConnection()
+        public DbHelper(bool f)
         {
-            return new SqlConnection(connString);
+
+        }
+
+        static string _connString = string.Empty;
+            //@"Data Source = D-5932S32\SQLEXPRESS; Initial Catalog = JhpiegoDb; Integrated Security = true";
+        public ConnectionBuilder DefaultConnectionBuilder
+        {
+            get; private set;
+        }
+        //public SqlConnection GetConnection()
+        //{
+        //    var csHelper = new ConnectionBuilder() {DatabaseName= "D-5932S32", InstanceName = "SQLEXPRESS", ServerName = "JhpiegoDb" };
+        //    return new SqlConnection(connString);
+        //}
+
+        public ConnectionBuilder SetDefaultConnection(ProjectName projectName)
+        {
+            var defaultServerName = "D-5932S32";
+            var defaultSqlExpress = "SQLEXPRESS";
+            var defaultDbName = "JhpiegoDb";
+            ConnectionBuilder connBuilder = null;
+            switch (projectName)
+            {
+                case ProjectName.DOD:
+                    {
+                        connBuilder = new ConnectionBuilder() { DatabaseName = "JhpiegoDb_DOD", InstanceName = defaultSqlExpress, ServerName = defaultServerName };
+                        break;
+                    }
+                case ProjectName.IHP_VMMC:
+                    {
+                        connBuilder = new ConnectionBuilder() { DatabaseName = "JhpiegoDb_IhpVmmc", InstanceName = defaultSqlExpress, ServerName = defaultServerName };
+                        break;
+                    }
+                case ProjectName.IHP_Capacity_Building_and_Training:
+                    {
+                        connBuilder = new ConnectionBuilder() { DatabaseName = "JhpiegoDb_IhpTraining", InstanceName = defaultSqlExpress, ServerName = defaultServerName };
+                        break;
+                    }
+            }
+            DefaultConnectionBuilder = connBuilder;
+            _connString = DefaultConnectionBuilder.GetConnectionString();
+            return connBuilder;
         }
 
         internal void ExecSql(string res)
         {
-            using(var conn = new SqlConnection(connString))
+            using(var conn = new SqlConnection(_connString))
             using(var cmd = new SqlCommand(res) {Connection = conn })
             {
                 conn.Open();
@@ -30,7 +94,7 @@ namespace template_reader.database
         internal void WriteTableToDb(string targetTable, DataTable table)
         {
             //use SqlBulkCopy to write to the server
-            using (var conn = new SqlConnection(connString))
+            using (var conn = new SqlConnection(_connString))
             using (var bcp = new SqlBulkCopy(conn) { DestinationTableName = targetTable })
             {
                 foreach (DataColumn c in table.Columns)
@@ -46,7 +110,7 @@ namespace template_reader.database
         private List<object> GetList(string sqlStatement)
         {
             var res = new List<object>();
-            using (var conn = new SqlConnection(connString))
+            using (var conn = new SqlConnection(_connString))
             using (var cmd = new SqlCommand(sqlStatement) { Connection = conn })
             {
                 conn.Open();
@@ -88,7 +152,7 @@ namespace template_reader.database
         internal int GetScalar(string sqlString)
         {
             var res = -1;
-            using (var conn = new SqlConnection(connString))
+            using (var conn = new SqlConnection(_connString))
             using (var cmd = new SqlCommand(sqlString) { Connection = conn })
             {
                 conn.Open();

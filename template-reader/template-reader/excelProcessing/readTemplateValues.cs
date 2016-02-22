@@ -17,15 +17,20 @@ namespace template_reader.excelProcessing
         public string fileName { get; set; }
 
         public IDisplayProgress progressDisplayHelper { get; set; }
+        public ProjectName SelectedProject
+        {
+            get;
+            internal set;
+        }
 
         List<ProgramAreaDefinition> _loadAllProgramDataElements;
 
         public List<DataValue> Execute()
         {
-            return DoDataImport();
+            return DoDataImport(SelectedProject);
         }
 
-        public List<DataValue> DoDataImport()
+        public List<DataValue> DoDataImport(ProjectName projectName)
         {
             _showSimilarMessages = true;
             List<DataValue> toReturn = null;
@@ -33,7 +38,7 @@ namespace template_reader.excelProcessing
             try
             {
                 excelApp = new Microsoft.Office.Interop.Excel.Application() { Visible = false };
-                var res = ImportData(excelApp);
+                var res = ImportData(excelApp, projectName);
                 if (IsInError)
                     return null;
                 toReturn = res;
@@ -50,6 +55,64 @@ namespace template_reader.excelProcessing
                 }
             }
             return toReturn;
+        }
+
+        private LocationDetail GetIhpReportLocationDetails(Workbook workbook)
+        {
+            var locationDetail = new LocationDetail();
+            var xlRange = ((Worksheet)workbook.Sheets[GetProgramAreaIndicators.IhpVmmcProgramAreaName]).UsedRange;
+
+            var facilityValue = Convert.ToString(getCellValue(xlRange, 2, 2)); //G1
+            if (!string.IsNullOrWhiteSpace(facilityValue))
+            {
+                var split = facilityValue.Split(new[] { '>' }, StringSplitOptions.RemoveEmptyEntries);
+                if (split.Length == 2)
+                {
+                    locationDetail.FacilityName = split[1];
+                    //we validate the hmiscode
+                }
+                else
+                {
+                    throw new ArgumentException("Missing entry or value for 'Facility Name' in worksheet " + GetProgramAreaIndicators.IhpVmmcProgramAreaName);
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Missing entry or value for 'Facility Name' in worksheet " + GetProgramAreaIndicators.IhpVmmcProgramAreaName);
+            }
+
+
+
+            var yearValue = Convert.ToString(getCellValue(xlRange, 5, 2)); //B5
+            if (!string.IsNullOrWhiteSpace(yearValue))
+            {
+                int year = -1;
+                if (!int.TryParse(yearValue.Trim(), out year))
+                {
+                    ShowErrorAndAbort(yearValue, "Year", GetProgramAreaIndicators.IhpVmmcProgramAreaName, 5, 2, true);
+                    //throw new ArgumentException("Error converting value " + fieldValue + " as a number");
+                }
+
+                locationDetail.ReportYear = Convert.ToInt32(yearValue.Trim());
+            }
+            else
+            {
+                throw new ArgumentException("Missing entry or value for 'Year' in worksheet " + GetProgramAreaIndicators.IhpVmmcProgramAreaName);
+            }
+
+            //report month
+            var mValue = Convert.ToString(getCellValue(xlRange, 5, 6)); //F5
+            if (!string.IsNullOrWhiteSpace(mValue) && ihpMonthNames.Contains(mValue.Trim()))
+            {
+                var lower = mValue.Substring(0, 3).ToLowerInvariant();
+                var mIndex = monthsShortName.FindIndex(t => t.ToLowerInvariant() == lower);
+                locationDetail.ReportMonth = monthsLongName[mIndex];
+            }
+            else {
+                throw new ArgumentException("Missing entry or value for 'Month Reported on' in worksheet " + GetProgramAreaIndicators.IhpVmmcProgramAreaName);
+            }
+
+            return locationDetail;
         }
 
         private LocationDetail GetReportLocationDetails(Workbook workbook)
@@ -111,6 +174,7 @@ namespace template_reader.excelProcessing
                     if (split.Length == 2)
                     {
                         locationDetail.FacilityName = split[1];
+                        //we validate the hmiscode
                     }
                     else
                     {
@@ -184,7 +248,7 @@ namespace template_reader.excelProcessing
 
         static List<string> monthsLongName = new List<string>() { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
         static List<string> monthsShortName = new List<string>() { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
+        static List<string> ihpMonthNames = new List<string>() { "Jan_1","Feb_2","Mar_3","Apr_4","May_5","Jun_6","Jul_7","Aug_8","Sep_9","Oct_10","Nov_11","Dec_12"};
         public void PerformProgressStep(string message = "")
         {
             progressDisplayHelper.PerformProgressStep(message);
@@ -218,9 +282,10 @@ namespace template_reader.excelProcessing
         }
 
         object initProgDatElmts = new object();
-        private List<DataValue> ImportData(Microsoft.Office.Interop.Excel.Application excelApp)
+        private List<DataValue> ImportData(Microsoft.Office.Interop.Excel.Application excelApp, ProjectName projectName)
         {
             PerformProgressStep("Please wait, initialising");
+
             //we load the indicator definitions and data categories
             if (_loadAllProgramDataElements == null)
             {
@@ -236,9 +301,6 @@ namespace template_reader.excelProcessing
             //for all available program areas, we read the values into an array
             var workbook = excelApp.Workbooks.Open(fileName, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value);
 
-            //we get the facility codes
-            var locationDetail = GetReportLocationDetails(workbook);
-
             //we get the other data
             var worksheetCount = workbook.Sheets.Count;
             var worksheetNames = new Dictionary<string, string>();
@@ -248,21 +310,69 @@ namespace template_reader.excelProcessing
                 worksheetNames.Add(worksheetName.Trim(), worksheetName);
             }
 
+            //we get the facility codes
+            LocationDetail locationDetail = null;
+
+            switch (projectName)
+            {
+                case ProjectName.DOD:
+                    {
+                        locationDetail = GetReportLocationDetails(workbook);
+                        break;
+                    }
+                case ProjectName.IHP_VMMC:
+                    {
+                        //then its VMMC, we remove the other DOD program areas and just leave one
+                        if (!worksheetNames.ContainsKey(GetProgramAreaIndicators.IhpVmmcProgramAreaName))
+                        {
+                            throw new ArgumentNullException("Invalid file selected");
+                        }
+
+                        var vmmcProgramArea = _loadAllProgramDataElements.FirstOrDefault(t => t.ProgramArea == GetProgramAreaIndicators.dodVmmcProgramAreaName);
+                        vmmcProgramArea.ProgramArea = GetProgramAreaIndicators.IhpVmmcProgramAreaName;
+                        _loadAllProgramDataElements.Clear();
+                        _loadAllProgramDataElements.Add(vmmcProgramArea);
+
+                        //_loadAllProgramDataElements.RemoveAll(t => t.ProgramArea != GetProgramAreaIndicators.dodVmmcProgramAreaName);
+                        //_loadAllProgramDataElements[GetProgramAreaIndicators.IhpVmmcProgramAreaName] = _loadAllProgramDataElements[GetProgramAreaIndicators.dodVmmcProgramAreaName];
+                        locationDetail = GetIhpReportLocationDetails(workbook);
+                        break;
+                    }
+                case ProjectName.IHP_Capacity_Building_and_Training:
+                    {
+                        break;
+                    }
+            }
+
+            if (locationDetail == null)
+                return null;
+
             var datavalues = new List<model.DataValue>();
 
             MarkStartOfMultipleSteps(_loadAllProgramDataElements.Count + 2);
             foreach (var dataElement in _loadAllProgramDataElements)
             {
-                PerformProgressStep("Please wait, Processing worksheet: " + dataElement.ProgramArea);
+                var programAreaName = dataElement.ProgramArea;
+                var worksheetName = programAreaName;
+                //if (isIhpVmmc && programAreaName != GetProgramAreaIndicators.dodVmmcProgramAreaName)
+                //    continue;
+
+                //if (projectName == ProjectName.IHP_VMMC)
+                //{
+                //    worksheetName = GetProgramAreaIndicators.IhpVmmcProgramAreaName;
+                //    programAreaName = GetProgramAreaIndicators.IhpVmmcProgramAreaName;
+                //}
+
+                PerformProgressStep("Please wait, Processing worksheet: " + programAreaName);
                 ResetSubProgressIndicator(dataElement.Indicators.Count + 1);
 
-                var xlrange = ((Worksheet)workbook.Sheets[worksheetNames[dataElement.ProgramArea]]).UsedRange;
+                var xlrange = ((Worksheet)workbook.Sheets[worksheetNames[worksheetName]]).UsedRange;
                 //we scan the first 3 rows for the row with the age groups specified for this program area
                 var rowCount = xlrange.Rows.Count;
                 var colCount = xlrange.Columns.Count;
 
                 //we have the column indexes of the first age category options, and other occurrences of the same
-                var firstAgeGroupCell = GetFirstAgeGroupCell(dataElement, xlrange);
+                var firstAgeGroupCell = GetFirstAgeGroupCell(dataElement, xlrange, ProjectName.IHP_VMMC == projectName);
 
                 //Now we find the row indexes of the program indicators
                 //ProgramIndicator currentRowMatchingIndicator = null;
@@ -284,12 +394,11 @@ namespace template_reader.excelProcessing
                 //we can now start reading these values into an array for each indicator vs age group
 
                 //we start reading the values from cell [firstIndcatorRowIndex, firstAgeGroupCell.Colmn1]
-                LogCsvOutput("Processing: " + dataElement.ProgramArea);
-
+                LogCsvOutput("Processing: " + programAreaName);
 
                 var testBuilder = new StringBuilder();
                 testBuilder.AppendLine();
-                testBuilder.AppendLine(dataElement.ProgramArea);
+                testBuilder.AppendLine(programAreaName);
 
                 var countdown = dataElement.Indicators.Count;
                 var i = firstIndcatorRowIndex;
@@ -300,7 +409,13 @@ namespace template_reader.excelProcessing
                     var indicatorid = getCellValue(xlrange, i, 1);
                     if (string.IsNullOrWhiteSpace(indicatorid))
                     {
-                        throw new ArgumentNullException(string.Format("Expected a value in Cell ( A{0}) for sheet {1}", i, dataElement.ProgramArea));
+                        if (ProjectName.IHP_VMMC == projectName)
+                        {
+                            countdown--; 
+                            continue;
+                        }
+
+                        throw new ArgumentNullException(string.Format("Expected a value in Cell ( A{0}) for sheet {1}", i, programAreaName));
                     }
 
                     var j = firstAgeGroupCell.ColumnId1;
@@ -474,13 +589,14 @@ namespace template_reader.excelProcessing
             }
         }
 
-        private static FirstAgeGroupOccurence GetFirstAgeGroupCell(ProgramAreaDefinition dataElement, Range xlrange)
+        private static FirstAgeGroupOccurence GetFirstAgeGroupCell(ProgramAreaDefinition dataElement, Range xlrange, bool isNonDod)
         {
             int colCount = xlrange.Columns.Count;
             int row = -1, colmn = -1, colmn2 = -1;
 
             var matchfound = false;
-            for (var rowId = 1; rowId <= 3; rowId++)
+            var maxDepthSearchRows = isNonDod ? 8 : 3;
+            for (var rowId = 1; rowId <= maxDepthSearchRows; rowId++)
             {
                 for (var colmnId = 1; colmnId <= colCount; colmnId++)
                 {

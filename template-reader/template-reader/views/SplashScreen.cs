@@ -29,6 +29,7 @@ namespace template_reader.views
         {
             //we reduce time remaining
             progressStepsRemaining -= progressStep;
+            progressStepsRemaining = progressStepsRemaining < 0 ? 0 : progressStepsRemaining;
             lblMainMessage.SetText(message);
             prgMain.SetValue(Convert.ToInt32((100 - progressStepsRemaining) * 1.0));
         }

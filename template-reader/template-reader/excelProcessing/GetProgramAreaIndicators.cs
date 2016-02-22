@@ -40,10 +40,13 @@ namespace template_reader.excelProcessing
             return svcs.FindAll(t => t.ProgramArea == worksheetName);
         }
 
+        public const string dodVmmcProgramAreaName = "Prevention-MC";
+        public const string IhpVmmcProgramAreaName = "MC";
+
         List<string> maleFemaleIndicators = new List<string>() { "STI", "TB", "ART", "Family Planning", "Prevention - PWP", "Clinical Care" };
 
         Dictionary<string, string> singleGenderIndicators = new Dictionary<string, string>(){
-            {"PMTCT","Female"  },            { "Prevention-MC" ,"Male"}            };
+            {"PMTCT","Female"  },            { dodVmmcProgramAreaName ,"Male"}            };
 
         private string UpdateIndicatorDefinitionsByProgramArea(Microsoft.Office.Interop.Excel.Application excelApp)
         {

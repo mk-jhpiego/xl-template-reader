@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.IO;
 using System.Windows.Forms;
 using template_reader.Commands;
 using template_reader.database;
 using template_reader.excelProcessing;
 using template_reader.model;
-using System.Linq;
-using System.Text;
-using System.Transactions;
+using template_reader.views;
 
 namespace template_reader
 {
@@ -23,7 +20,7 @@ namespace template_reader
 
         void importDataAction()
         {
-            var dataImporter = new GetValuesFromReport() { fileName = lblSelectedFile.Text }.DoDataImport();
+            var dataImporter = new GetValuesFromReport() { fileName = lblSelectedFile.Text, SelectedProject = CurrentProjectName }.DoDataImport(CurrentProjectName);
         }
 
         delegate void refreshDisplay(DataSet ds);
@@ -31,6 +28,10 @@ namespace template_reader
 
         volatile List<DataValue> valuesList = null;
         volatile DataSet valuesDataset = null;
+
+        public ProjectName CurrentProjectName;
+
+        DbHelper _dbHelper = null;
 
         private void btnSelectFileToImport_Click(object sender, EventArgs e)
         {            
@@ -57,7 +58,7 @@ namespace template_reader
                 _runner = new CodeRunner<List<DataValue>>()
                 {
                     ShowSplash = true,
-                    CodeToExcute = new GetValuesFromReport() { fileName = lblSelectedFile.Text },
+                    CodeToExcute = new GetValuesFromReport() { fileName = lblSelectedFile.Text, SelectedProject = CurrentProjectName },
                     AsyncCallBack = (q) =>
                     {
                         if (q == null)
@@ -123,27 +124,58 @@ namespace template_reader
 
         private void btnSaveToServer_Click(object sender, EventArgs e)
         {
-            //we get valuesDataset
-            var ds = valuesDataset;
-            if (ds.Tables.Count == 0)
+            var serverConfig = new frmServerConfig() { StartPosition = FormStartPosition.CenterParent, SelectedProject = CurrentProjectName, DefaultConnectionBuilder = DbHelper.Get};
+            if (serverConfig.ShowDialog() == DialogResult.OK)
             {
-                MessageBox.Show("Nothing to export");
-                return;
+                var connBuilder = serverConfig.DefaultConnectionBuilder;
+                //we get valuesDataset
+                var ds = valuesDataset;
+                if (ds.Tables.Count == 0)
+                {
+                    MessageBox.Show("Nothing to export");
+                    return;
+                }
+                var tempTableName = new RandomTableNameGenerator().Execute();
+                valuesDataset.Tables[0].TableName = tempTableName;
+
+                var dataImporter = new SaveTableToDbCommand() { TargetDataset = valuesDataset };
+                dataImporter.Execute();
+
+                //we start the merge
+                var dataMerge = new DataMergeCommand()
+                {
+                    DatabaseHelper = new DbHelper(),
+                    TempTableName = tempTableName,
+                    DestinationTable = "FacilityData"
+                };
+                dataMerge.Execute();
+
+                EnableSaveButtons(false);
+                //MessageBox.Show("Merge completed");
             }
-            var tempTableName = new RandomTableNameGenerator().Execute();
-            valuesDataset.Tables[0].TableName = tempTableName;
+            else
+            {
+                btnSaveToCsv.EnableControl(true);
+                btnSaveToServer.EnableControl(false);
+            }
+        }
 
-            var dataImporter = new SaveTableToDbCommand() { TargetDataset = valuesDataset };
-            dataImporter.Execute();
-
-            //we start the merge
-            var dataMerge = new DataMergeCommand() {
-                DatabaseHelper = new DbHelper(),
-                TempTableName = tempTableName, DestinationTable = "FacilityData" };
-            dataMerge.Execute();
-
-            EnableSaveButtons(false);            
-            //MessageBox.Show("Merge completed");
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            this.Visible = false;
+            var projectSelector = new ProgramSelector() { StartPosition = FormStartPosition.CenterParent };
+            if (projectSelector.ShowDialog() == DialogResult.OK)
+            {
+                _dbHelper = new DbHelper();
+                CurrentProjectName = projectSelector.SelectedProject;
+                //we set the appropriate settings to show this project
+                Text += string.Format("  ({0})", CurrentProjectName.ToString().Replace('_', ' '));
+                this.Visible = true;
+            }
+            else
+            {
+                Application.Exit();
+            }
         }
     }
 }
