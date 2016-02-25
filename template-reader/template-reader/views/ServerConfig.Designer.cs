@@ -43,6 +43,7 @@
             this.label6 = new System.Windows.Forms.Label();
             this.btnTest = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnCycleConnection = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -50,7 +51,7 @@
             // btnConfirm
             // 
             this.btnConfirm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnConfirm.Location = new System.Drawing.Point(152, 212);
+            this.btnConfirm.Location = new System.Drawing.Point(141, 212);
             this.btnConfirm.Name = "btnConfirm";
             this.btnConfirm.Size = new System.Drawing.Size(82, 54);
             this.btnConfirm.TabIndex = 0;
@@ -61,7 +62,7 @@
             // tServerName
             // 
             this.tServerName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tServerName.Location = new System.Drawing.Point(117, 49);
+            this.tServerName.Location = new System.Drawing.Point(106, 49);
             this.tServerName.Name = "tServerName";
             this.tServerName.Size = new System.Drawing.Size(188, 26);
             this.tServerName.TabIndex = 1;
@@ -70,7 +71,7 @@
             // tInstanceName
             // 
             this.tInstanceName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tInstanceName.Location = new System.Drawing.Point(117, 81);
+            this.tInstanceName.Location = new System.Drawing.Point(106, 81);
             this.tInstanceName.Name = "tInstanceName";
             this.tInstanceName.Size = new System.Drawing.Size(188, 26);
             this.tInstanceName.TabIndex = 2;
@@ -79,7 +80,7 @@
             // tDatabaseName
             // 
             this.tDatabaseName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tDatabaseName.Location = new System.Drawing.Point(117, 113);
+            this.tDatabaseName.Location = new System.Drawing.Point(106, 113);
             this.tDatabaseName.Name = "tDatabaseName";
             this.tDatabaseName.Size = new System.Drawing.Size(188, 26);
             this.tDatabaseName.TabIndex = 3;
@@ -89,7 +90,7 @@
             // 
             this.textBox4.Enabled = false;
             this.textBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox4.Location = new System.Drawing.Point(117, 168);
+            this.textBox4.Location = new System.Drawing.Point(106, 168);
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(188, 26);
             this.textBox4.TabIndex = 4;
@@ -98,7 +99,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.SystemColors.Control;
-            this.label1.Location = new System.Drawing.Point(42, 57);
+            this.label1.Location = new System.Drawing.Point(31, 57);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(69, 13);
             this.label1.TabIndex = 5;
@@ -108,7 +109,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.BackColor = System.Drawing.SystemColors.Control;
-            this.label2.Location = new System.Drawing.Point(32, 89);
+            this.label2.Location = new System.Drawing.Point(21, 89);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(79, 13);
             this.label2.TabIndex = 6;
@@ -118,7 +119,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.BackColor = System.Drawing.SystemColors.Control;
-            this.label3.Location = new System.Drawing.Point(27, 121);
+            this.label3.Location = new System.Drawing.Point(16, 121);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(84, 13);
             this.label3.TabIndex = 7;
@@ -130,7 +131,7 @@
             this.checkBox1.BackColor = System.Drawing.SystemColors.Control;
             this.checkBox1.Checked = true;
             this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox1.Location = new System.Drawing.Point(117, 145);
+            this.checkBox1.Location = new System.Drawing.Point(106, 145);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(141, 17);
             this.checkBox1.TabIndex = 8;
@@ -141,7 +142,7 @@
             // 
             this.textBox5.Enabled = false;
             this.textBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox5.Location = new System.Drawing.Point(117, 200);
+            this.textBox5.Location = new System.Drawing.Point(106, 200);
             this.textBox5.Name = "textBox5";
             this.textBox5.Size = new System.Drawing.Size(188, 26);
             this.textBox5.TabIndex = 9;
@@ -151,7 +152,7 @@
             this.label4.AutoSize = true;
             this.label4.BackColor = System.Drawing.SystemColors.Control;
             this.label4.Enabled = false;
-            this.label4.Location = new System.Drawing.Point(58, 208);
+            this.label4.Location = new System.Drawing.Point(47, 208);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(53, 13);
             this.label4.TabIndex = 11;
@@ -162,7 +163,7 @@
             this.label5.AutoSize = true;
             this.label5.BackColor = System.Drawing.SystemColors.Control;
             this.label5.Enabled = false;
-            this.label5.Location = new System.Drawing.Point(56, 176);
+            this.label5.Location = new System.Drawing.Point(45, 176);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(55, 13);
             this.label5.TabIndex = 10;
@@ -172,7 +173,7 @@
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(80, 9);
+            this.label6.Location = new System.Drawing.Point(69, 9);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(218, 20);
             this.label6.TabIndex = 12;
@@ -181,7 +182,7 @@
             // btnTest
             // 
             this.btnTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnTest.Location = new System.Drawing.Point(83, 212);
+            this.btnTest.Location = new System.Drawing.Point(72, 212);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(63, 54);
             this.btnTest.TabIndex = 13;
@@ -192,18 +193,34 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.SystemColors.Control;
+            this.panel1.Controls.Add(this.btnCycleConnection);
             this.panel1.Controls.Add(this.btnCancel);
             this.panel1.Controls.Add(this.btnTest);
             this.panel1.Controls.Add(this.btnConfirm);
             this.panel1.Location = new System.Drawing.Point(12, 34);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(335, 278);
+            this.panel1.Size = new System.Drawing.Size(391, 278);
             this.panel1.TabIndex = 14;
+            // 
+            // btnCycleConnection
+            // 
+            this.btnCycleConnection.BackColor = System.Drawing.Color.Transparent;
+            this.btnCycleConnection.BackgroundImage = global::template_reader.Properties.Resources._1456408967_arrow_leftright;
+            this.btnCycleConnection.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnCycleConnection.FlatAppearance.BorderSize = 0;
+            this.btnCycleConnection.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCycleConnection.Location = new System.Drawing.Point(288, -5);
+            this.btnCycleConnection.Name = "btnCycleConnection";
+            this.btnCycleConnection.Size = new System.Drawing.Size(68, 69);
+            this.btnCycleConnection.TabIndex = 15;
+            this.btnCycleConnection.Text = "Change";
+            this.btnCycleConnection.UseVisualStyleBackColor = false;
+            this.btnCycleConnection.Click += new System.EventHandler(this.btnCycleConnection_Click);
             // 
             // btnCancel
             // 
             this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCancel.Location = new System.Drawing.Point(240, 212);
+            this.btnCancel.Location = new System.Drawing.Point(229, 212);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(53, 54);
             this.btnCancel.TabIndex = 14;
@@ -216,7 +233,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.ClientSize = new System.Drawing.Size(359, 324);
+            this.ClientSize = new System.Drawing.Size(415, 324);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label5);
@@ -233,6 +250,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "frmServerConfig";
             this.Text = "ServerConfig";
+            this.Load += new System.EventHandler(this.frmServerConfig_Load);
             this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -257,5 +275,6 @@
         private System.Windows.Forms.Button btnTest;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button btnCancel;
+        private System.Windows.Forms.Button btnCycleConnection;
     }
 }

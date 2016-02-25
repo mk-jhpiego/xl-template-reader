@@ -40,7 +40,7 @@ namespace template_reader.Commands
             select dc.ColumnName + " varchar(250)")));
 
             //initialise db
-            var db = new DbHelper();
+            var db = DbFactory.Instance.GetDbHelper();
             int recordsImported = -5;
             using (var transaction = new TransactionScope(TransactionScopeOption.Required, new TimeSpan(2, 0, 0)))
             {

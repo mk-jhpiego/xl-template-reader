@@ -124,10 +124,10 @@ namespace template_reader
 
         private void btnSaveToServer_Click(object sender, EventArgs e)
         {
-            var serverConfig = new frmServerConfig() { StartPosition = FormStartPosition.CenterParent, SelectedProject = CurrentProjectName, DefaultConnectionBuilder = DbHelper.Get};
+            //we show where data will be saved to, prompt if there's need to chaneg the connection
+            var serverConfig = new frmServerConfig() { StartPosition = FormStartPosition.CenterParent };
             if (serverConfig.ShowDialog() == DialogResult.OK)
             {
-                var connBuilder = serverConfig.DefaultConnectionBuilder;
                 //we get valuesDataset
                 var ds = valuesDataset;
                 if (ds.Tables.Count == 0)
@@ -144,13 +144,16 @@ namespace template_reader
                 //we start the merge
                 var dataMerge = new DataMergeCommand()
                 {
-                    DatabaseHelper = new DbHelper(),
                     TempTableName = tempTableName,
                     DestinationTable = "FacilityData"
                 };
+
+                // we save, 
                 dataMerge.Execute();
 
                 EnableSaveButtons(false);
+                //and show the confirmatin that the file has been saved
+                //perhaps show a tick
                 //MessageBox.Show("Merge completed");
             }
             else
@@ -166,10 +169,12 @@ namespace template_reader
             var projectSelector = new ProgramSelector() { StartPosition = FormStartPosition.CenterParent };
             if (projectSelector.ShowDialog() == DialogResult.OK)
             {
-                _dbHelper = new DbHelper();
+                var connBuilder = DbFactory.Instance.SetProjectDatabase(projectSelector.SelectedProject);
+                _dbHelper = DbFactory.Instance.GetDbHelper();
                 CurrentProjectName = projectSelector.SelectedProject;
+
                 //we set the appropriate settings to show this project
-                Text += string.Format("  ({0})", CurrentProjectName.ToString().Replace('_', ' '));
+                Text += string.Format("  ({0})", projectSelector.SelectedProject.ToString().Replace('_', ' '));
                 this.Visible = true;
             }
             else

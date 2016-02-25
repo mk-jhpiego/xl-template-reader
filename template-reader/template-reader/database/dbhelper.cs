@@ -3,59 +3,36 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using template_reader.model;
 
 namespace template_reader.database
 {
-    public class ConnectionBuilder
+    public class DbFactory
     {
-        //static string connString = @"Data Source = D-5932S32\SQLEXPRESS; Initial Catalog = JhpiegoDb; Integrated Security = true";
-        static string connStringX = @"Data Source = {0}\{1}; Initial Catalog = {2}; Integrated Security = true";
-
-        public string GetConnectionString()
+        static DbFactory _factoryInstance;
+        public static DbFactory Instance
         {
-            return string.Format(connStringX, ServerName, InstanceName, DatabaseName);
-        }
-        public string ServerName { get; set; }
-        public string InstanceName { get; set; }
-
-        internal bool IsValid()
-        {
-            return true;
+            get
+            {
+                if (_factoryInstance == null)
+                {
+                    _factoryInstance = new DbFactory();
+                }
+                return _factoryInstance;
+            }
         }
 
-        public string DatabaseName { get; set; }
-        //public bool IntegratedSecurity { get; set; }
-        //public string UserName { get; set; }
-        //public string Password { get; set; }
-    }
-
-    public class DbHelper
-    {
-        public DbHelper(bool f)
+        public ConnectionBuilder ConnBuilder { get; private set; }
+        private ConnectionBuilder GetDefaultConnection(ProjectName projectName, bool getAlternate = false)
         {
+            var defaultServerName = "ZM-VLUS56";
+            var defaultSqlExpress = string.Empty;
+            if (getAlternate)
+            {
+                defaultServerName = "D-5932S32";
+                defaultSqlExpress = "SQL2014";
+            }
 
-        }
-
-        static string _connString = string.Empty;
-            //@"Data Source = D-5932S32\SQLEXPRESS; Initial Catalog = JhpiegoDb; Integrated Security = true";
-        public ConnectionBuilder DefaultConnectionBuilder
-        {
-            get; private set;
-        }
-        //public SqlConnection GetConnection()
-        //{
-        //    var csHelper = new ConnectionBuilder() {DatabaseName= "D-5932S32", InstanceName = "SQLEXPRESS", ServerName = "JhpiegoDb" };
-        //    return new SqlConnection(connString);
-        //}
-
-        public ConnectionBuilder SetDefaultConnection(ProjectName projectName)
-        {
-            var defaultServerName = "D-5932S32";
-            var defaultSqlExpress = "SQLEXPRESS";
-            var defaultDbName = "JhpiegoDb";
             ConnectionBuilder connBuilder = null;
             switch (projectName)
             {
@@ -75,9 +52,71 @@ namespace template_reader.database
                         break;
                     }
             }
-            DefaultConnectionBuilder = connBuilder;
-            _connString = DefaultConnectionBuilder.GetConnectionString();
             return connBuilder;
+        }
+
+        internal void OverwriteDefaultConnection(ConnectionBuilder connBuilder)
+        {
+            ConnBuilder = connBuilder;
+        }
+
+        internal ConnectionBuilder GetAlternateConnection(ConnectionBuilder connBuilder)
+        {
+            return GetDefaultConnection(_currentProjectName, true);
+        }
+
+        ProjectName _currentProjectName;
+        internal ConnectionBuilder SetProjectDatabase(ProjectName selectedProject)
+        {
+            _currentProjectName = selectedProject;
+            return ConnBuilder = GetDefaultConnection(_currentProjectName);
+        }
+
+        public DbHelper GetDbHelper()
+        {
+            return new DbHelper(ConnBuilder);
+        }
+    }
+
+    public class ConnectionBuilder
+    {
+        //static string connString = @"Data Source = D-5932S32\SQLEXPRESS; Initial Catalog = JhpiegoDb; Integrated Security = true";
+        const string connStringX = @"Data Source = {0}\{1}; Initial Catalog = {2}; Integrated Security = true";
+        const string connStringForDefaultInstance = @"Data Source = {0}; Initial Catalog = {1}; Integrated Security = true";
+
+        public string GetConnectionString()
+        {
+            if (string.IsNullOrWhiteSpace(InstanceName))
+            {
+                return string.Format(connStringForDefaultInstance, ServerName, DatabaseName);
+            }
+            return string.Format(connStringX, ServerName, InstanceName, DatabaseName);
+        }
+        public string ServerName { get; set; }
+        public string InstanceName { get; set; }
+
+        internal bool IsValid()
+        {
+            return true;
+        }
+
+        public string DatabaseName { get; set; }
+        public string ConnectionString { get; internal set; }
+        //public static string DefaultInstanceName = "default";
+        //public bool IntegratedSecurity { get; set; }
+        //public string UserName { get; set; }
+        //public string Password { get; set; }
+    }
+
+    public class DbHelper
+    {
+        ConnectionBuilder _connBuilder = null;
+        //ProjectName _projectName;
+        string _connString;
+        public DbHelper(ConnectionBuilder builder)
+        {
+            _connBuilder = builder;
+            _connString = _connBuilder.GetConnectionString();
         }
 
         internal void ExecSql(string res)

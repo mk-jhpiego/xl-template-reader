@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using template_reader.database;
 using template_reader.model;
@@ -21,41 +14,56 @@ namespace template_reader.views
 
         private void btnTest_Click(object sender, EventArgs e)
         {
-            var connBuilder = new ConnectionBuilder() {  DatabaseName= tDatabaseName.Text, InstanceName = tInstanceName.Text, ServerName = tServerName.Text };
+            var connBuilder = BuildConnection();
             if (connBuilder.IsValid())
             {
                 MessageBox.Show("Database connection successful");
             }
             else
             {
-                DefaultConnectionBuilder = null;
+                MessageBox.Show("Failed to verify database connection");
             }
         }
 
-        public ConnectionBuilder DefaultConnectionBuilder = null;
+        private ConnectionBuilder BuildConnection()
+        {
+            return new ConnectionBuilder() { DatabaseName = tDatabaseName.Text, InstanceName = tInstanceName.Text, ServerName = tServerName.Text };
+        }
 
         public ProjectName SelectedProject { get; internal set; }
-        //public object DefaultConnectionBuilder { get; internal set; }
 
         private void btnConfirm_Click(object sender, EventArgs e)
         {
-            var connBuilder = new ConnectionBuilder() { DatabaseName = tDatabaseName.Text, InstanceName = tInstanceName.Text, ServerName = tServerName.Text };
-            if (connBuilder.IsValid())
+            var connBuilder = BuildConnection();
+            if (!connBuilder.IsValid())
             {
-                DefaultConnectionBuilder = connBuilder;
-                this.DialogResult = DialogResult.OK;
+                MessageBox.Show("Failed to verify database connection");
+                return;
             }
-            else
-            {
-                DefaultConnectionBuilder = null;
-                MessageBox.Show("Connection attempt unsuccessful");
-            }
+            DbFactory.Instance.OverwriteDefaultConnection(connBuilder);
+            this.DialogResult = DialogResult.OK;
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            DefaultConnectionBuilder = null;
             this.DialogResult = DialogResult.Cancel;
+        }
+
+        private void frmServerConfig_Load(object sender, EventArgs e)
+        {
+            DisplayConnectionSettings(DbFactory.Instance.ConnBuilder);
+        }
+
+        private void DisplayConnectionSettings(ConnectionBuilder connBuilder)
+        {
+            tDatabaseName.Text = connBuilder.DatabaseName;
+            tInstanceName.Text = connBuilder.InstanceName;
+            tServerName.Text = connBuilder.ServerName;
+        }
+
+        private void btnCycleConnection_Click(object sender, EventArgs e)
+        {
+            DisplayConnectionSettings(DbFactory.Instance.GetAlternateConnection(DbFactory.Instance.ConnBuilder));
         }
     }
 }

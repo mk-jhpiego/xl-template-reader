@@ -13,7 +13,7 @@ namespace template_reader.database
         public bool IsInError { get; set; }
         public string DestinationTable { get; set; }
         public string TempTableName { get; set; }
-        public DbHelper DatabaseHelper { get; set; }
+        
         //var db = new DbHelper();
         public IDisplayProgress progressDisplayHelper { get; set; }
         public IEnumerable<string> Execute()
@@ -25,15 +25,16 @@ namespace template_reader.database
 
         public void DoMerge()
         {
+            var dbHelper = DbFactory.Instance.GetDbHelper();
             IsInError = false;
             var sql = string.Empty;
             //steps
             //read excel file to table facilityDataTemp
             ///x. copyDataFromExcel "facilityDataTemp", strSourceDatabase2
-            
+
             //we check if all age categories are mapped to existing ids
             sql = "select distinct AgeGroup from {0} except select AgeGroup from AgeGroupLookupAlternate";
-            var values = DatabaseHelper.GetListText(string.Format(sql, TempTableName));
+            var values = dbHelper.GetListText(string.Format(sql, TempTableName));
 
             if (values.Count > 0)
             {
@@ -63,7 +64,7 @@ into {1}
  join GenderLookUp g on d.Sex = g.GenderLongName
  join [dbo].[IndicatorLookup] il on d.IndicatorId = il.IndicatorId
 ";
-            DatabaseHelper.ExecSql(string.Format(sql, TempTableName, newTempTableName));
+            dbHelper.ExecSql(string.Format(sql, TempTableName, newTempTableName));
 
             //we check if the data we have is unique or already exists
             sql = @"
@@ -74,7 +75,7 @@ f.facilityindex = t.FacilityIndex and f.YearId = t.ReferenceYear
 ";
 
             DialogResult dlgRes;
-            var recCount = DatabaseHelper.GetScalar(string.Format(sql, newTempTableName));
+            var recCount = dbHelper.GetScalar(string.Format(sql, newTempTableName));
             if (recCount > 0)
             {
                 dlgRes = MessageBox.Show("Records for this facility already exist on the server. Do you want to stop this process?", "Confirm Action", MessageBoxButtons.YesNo);
@@ -101,7 +102,7 @@ f.facilityindex = t.FacilityIndex and f.YearId = t.ReferenceYear
  (select distinct facilityindex, YearId, ReferenceMonth from  {0}) t 
  on f.facilityindex = t.FacilityIndex and f.ReferenceYear = t.YearId
  and f.ReferenceMonth = t.ReferenceMonth)";
-                DatabaseHelper.ExecSql(string.Format(sql, newTempTableName));
+                dbHelper.ExecSql(string.Format(sql, newTempTableName));
             }
 
             //we import the data
@@ -113,11 +114,11 @@ SELECT
 [FacilityIndex],[IndicatorSerial],[YearID],
 [ReferenceMonth],[Sex] as GenderId,[AgeGroupId],
 [Value] as IndicatorValue FROM {0}";
-            DatabaseHelper.ExecSql(string.Format(sql, newTempTableName));
+            dbHelper.ExecSql(string.Format(sql, newTempTableName));
 
             //we clean up
             sql = "drop table {0}";
-            DatabaseHelper.ExecSql(string.Format(sql, newTempTableName));
+            dbHelper.ExecSql(string.Format(sql, newTempTableName));
         }
     }
 }
