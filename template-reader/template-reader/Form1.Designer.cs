@@ -35,23 +35,29 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.btnSaveToCsv = new System.Windows.Forms.Button();
             this.btnSaveToServer = new System.Windows.Forms.Button();
+            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
+            this.splitContainer2.Panel2.SuspendLayout();
+            this.splitContainer2.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnSelectFileToImport
             // 
-            this.btnSelectFileToImport.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.btnSelectFileToImport.BackColor = System.Drawing.Color.Transparent;
+            this.btnSelectFileToImport.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.btnSelectFileToImport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSelectFileToImport.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSelectFileToImport.ForeColor = System.Drawing.SystemColors.ControlText;
             this.btnSelectFileToImport.Location = new System.Drawing.Point(12, 12);
             this.btnSelectFileToImport.Name = "btnSelectFileToImport";
             this.btnSelectFileToImport.Size = new System.Drawing.Size(117, 52);
             this.btnSelectFileToImport.TabIndex = 1;
-            this.btnSelectFileToImport.Text = "Select File to Import";
+            this.btnSelectFileToImport.Text = "Select File";
             this.btnSelectFileToImport.UseVisualStyleBackColor = false;
             this.btnSelectFileToImport.Click += new System.EventHandler(this.btnSelectFileToImport_Click);
             // 
@@ -85,7 +91,7 @@
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView1.Location = new System.Drawing.Point(0, 0);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(759, 345);
+            this.dataGridView1.Size = new System.Drawing.Size(562, 345);
             this.dataGridView1.TabIndex = 5;
             // 
             // splitContainer1
@@ -106,7 +112,7 @@
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.dataGridView1);
+            this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
             this.splitContainer1.Size = new System.Drawing.Size(759, 437);
             this.splitContainer1.SplitterDistance = 88;
             this.splitContainer1.TabIndex = 6;
@@ -139,6 +145,21 @@
             this.btnSaveToServer.UseVisualStyleBackColor = false;
             this.btnSaveToServer.Click += new System.EventHandler(this.btnSaveToServer_Click);
             // 
+            // splitContainer2
+            // 
+            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer2.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.splitContainer2.IsSplitterFixed = true;
+            this.splitContainer2.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer2.Name = "splitContainer2";
+            // 
+            // splitContainer2.Panel2
+            // 
+            this.splitContainer2.Panel2.Controls.Add(this.dataGridView1);
+            this.splitContainer2.Size = new System.Drawing.Size(759, 345);
+            this.splitContainer2.SplitterDistance = 193;
+            this.splitContainer2.TabIndex = 6;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -155,6 +176,9 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.splitContainer2.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
+            this.splitContainer2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -168,6 +192,7 @@
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Button btnSaveToCsv;
         private System.Windows.Forms.Button btnSaveToServer;
+        private System.Windows.Forms.SplitContainer splitContainer2;
     }
 }
 

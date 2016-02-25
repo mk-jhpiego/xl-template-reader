@@ -155,6 +155,10 @@ namespace template_reader
                 //and show the confirmatin that the file has been saved
                 //perhaps show a tick
                 //MessageBox.Show("Merge completed");
+
+
+                //we clear the grid
+                dataGridView1.DataSource = "";
             }
             else
             {

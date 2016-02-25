@@ -57,7 +57,7 @@ a.AgeGroupId,
 IndicatorValue Value
 into {1}
  From {0} d
- join FacilityLookUp f on d.FacilityName = rtrim(ltrim(f.FacilityID))
+ join FacilityLookupAll f on d.FacilityName = rtrim(ltrim(f.FacilityHmisCode))
  join YearLookUp y on d.ReportYear = y.YearName
  join MonthLookUp m on d.ReportMonth = m.MonthName
  join AgeGroupLookupAlternate a on d.AgeGroup = a.AgeGroup
@@ -117,8 +117,8 @@ SELECT
             dbHelper.ExecSql(string.Format(sql, newTempTableName));
 
             //we clean up
-            sql = "drop table {0}";
-            dbHelper.ExecSql(string.Format(sql, newTempTableName));
+            sql = "drop table {0};drop table {1}; ";
+            dbHelper.ExecSql(string.Format(sql, newTempTableName, TempTableName));
         }
     }
 }
