@@ -118,19 +118,25 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="1456409014_document_xls" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="xls_doc" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Icons\1456409014_document_xls.ico;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="1456408783_checkmark" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Icons\1456408783_checkmark.ico;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="left_right_arrow_lrg" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\1456409801_arrow_leftright.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="1456408967_arrow_leftright" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="left_right_arrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Icons\1456408967_arrow_leftright.ico;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="1456408828_arrow_cycle" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="checkmark" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\1456408783_checkmark.ico;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="refresh_arrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Icons\1456408828_arrow_cycle.ico;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="1456409801_arrow_leftright" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Icons\1456409801_arrow_leftright.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="jhpiego" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\jhpiego.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="jhpiego_logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\jhpiego_logo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

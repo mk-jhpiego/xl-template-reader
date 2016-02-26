@@ -63,9 +63,9 @@ namespace template_reader.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap _1456408783_checkmark {
+        internal static System.Drawing.Bitmap checkmark {
             get {
-                object obj = ResourceManager.GetObject("1456408783_checkmark", resourceCulture);
+                object obj = ResourceManager.GetObject("checkmark", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace template_reader.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap _1456408828_arrow_cycle {
+        internal static System.Drawing.Bitmap jhpiego {
             get {
-                object obj = ResourceManager.GetObject("1456408828_arrow_cycle", resourceCulture);
+                object obj = ResourceManager.GetObject("jhpiego", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -83,9 +83,9 @@ namespace template_reader.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap _1456408967_arrow_leftright {
+        internal static System.Drawing.Bitmap jhpiego_logo {
             get {
-                object obj = ResourceManager.GetObject("1456408967_arrow_leftright", resourceCulture);
+                object obj = ResourceManager.GetObject("jhpiego_logo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -93,9 +93,9 @@ namespace template_reader.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap _1456409014_document_xls {
+        internal static System.Drawing.Bitmap left_right_arrow {
             get {
-                object obj = ResourceManager.GetObject("1456409014_document_xls", resourceCulture);
+                object obj = ResourceManager.GetObject("left_right_arrow", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -103,9 +103,29 @@ namespace template_reader.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap _1456409801_arrow_leftright {
+        internal static System.Drawing.Bitmap left_right_arrow_lrg {
             get {
-                object obj = ResourceManager.GetObject("1456409801_arrow_leftright", resourceCulture);
+                object obj = ResourceManager.GetObject("left_right_arrow_lrg", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap refresh_arrow {
+            get {
+                object obj = ResourceManager.GetObject("refresh_arrow", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap xls_doc {
+            get {
+                object obj = ResourceManager.GetObject("xls_doc", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

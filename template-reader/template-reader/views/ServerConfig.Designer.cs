@@ -205,7 +205,7 @@
             // btnCycleConnection
             // 
             this.btnCycleConnection.BackColor = System.Drawing.Color.Transparent;
-            this.btnCycleConnection.BackgroundImage = global::template_reader.Properties.Resources._1456408967_arrow_leftright;
+            this.btnCycleConnection.BackgroundImage = global::template_reader.Properties.Resources.left_right_arrow;
             this.btnCycleConnection.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.btnCycleConnection.FlatAppearance.BorderSize = 0;
             this.btnCycleConnection.FlatStyle = System.Windows.Forms.FlatStyle.Flat;

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.btnSelectFileToImport = new System.Windows.Forms.Button();
             this.lblSelectedFile = new System.Windows.Forms.Label();
             this.btnUpdateProgramIndicatorsList = new System.Windows.Forms.Button();
@@ -48,7 +49,7 @@
             // 
             // btnSelectFileToImport
             // 
-            this.btnSelectFileToImport.BackColor = System.Drawing.Color.Transparent;
+            this.btnSelectFileToImport.BackColor = System.Drawing.Color.DarkGray;
             this.btnSelectFileToImport.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.btnSelectFileToImport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSelectFileToImport.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -76,9 +77,9 @@
             // 
             this.btnUpdateProgramIndicatorsList.BackColor = System.Drawing.SystemColors.ControlDark;
             this.btnUpdateProgramIndicatorsList.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnUpdateProgramIndicatorsList.Location = new System.Drawing.Point(638, 12);
+            this.btnUpdateProgramIndicatorsList.Location = new System.Drawing.Point(346, 12);
             this.btnUpdateProgramIndicatorsList.Name = "btnUpdateProgramIndicatorsList";
-            this.btnUpdateProgramIndicatorsList.Size = new System.Drawing.Size(109, 63);
+            this.btnUpdateProgramIndicatorsList.Size = new System.Drawing.Size(109, 52);
             this.btnUpdateProgramIndicatorsList.TabIndex = 4;
             this.btnUpdateProgramIndicatorsList.Text = " Update Program Indicators List";
             this.btnUpdateProgramIndicatorsList.UseVisualStyleBackColor = false;
@@ -104,6 +105,8 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.BackColor = System.Drawing.Color.White;
+            this.splitContainer1.Panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.splitContainer1.Panel1.Controls.Add(this.btnSaveToCsv);
             this.splitContainer1.Panel1.Controls.Add(this.btnSaveToServer);
             this.splitContainer1.Panel1.Controls.Add(this.btnSelectFileToImport);
@@ -123,7 +126,7 @@
             this.btnSaveToCsv.Enabled = false;
             this.btnSaveToCsv.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSaveToCsv.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSaveToCsv.Location = new System.Drawing.Point(464, 12);
+            this.btnSaveToCsv.Location = new System.Drawing.Point(245, 12);
             this.btnSaveToCsv.Name = "btnSaveToCsv";
             this.btnSaveToCsv.Size = new System.Drawing.Size(95, 52);
             this.btnSaveToCsv.TabIndex = 3;
@@ -153,6 +156,10 @@
             this.splitContainer2.Location = new System.Drawing.Point(0, 0);
             this.splitContainer2.Name = "splitContainer2";
             // 
+            // splitContainer2.Panel1
+            // 
+            this.splitContainer2.Panel1.BackColor = System.Drawing.Color.SeaGreen;
+            // 
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.dataGridView1);
@@ -167,6 +174,7 @@
             this.ClientSize = new System.Drawing.Size(759, 437);
             this.Controls.Add(this.splitContainer1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "Data Importer";
             this.Load += new System.EventHandler(this.Form1_Load);
