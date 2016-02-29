@@ -37,6 +37,7 @@
             this.btnSaveToCsv = new System.Windows.Forms.Button();
             this.btnSaveToServer = new System.Windows.Forms.Button();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.btnResetMainPage = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -107,6 +108,7 @@
             // 
             this.splitContainer1.Panel1.BackColor = System.Drawing.Color.White;
             this.splitContainer1.Panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.splitContainer1.Panel1.Controls.Add(this.btnResetMainPage);
             this.splitContainer1.Panel1.Controls.Add(this.btnSaveToCsv);
             this.splitContainer1.Panel1.Controls.Add(this.btnSaveToServer);
             this.splitContainer1.Panel1.Controls.Add(this.btnSelectFileToImport);
@@ -167,6 +169,19 @@
             this.splitContainer2.SplitterDistance = 193;
             this.splitContainer2.TabIndex = 6;
             // 
+            // btnResetMainPage
+            // 
+            this.btnResetMainPage.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.btnResetMainPage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnResetMainPage.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnResetMainPage.Location = new System.Drawing.Point(461, 12);
+            this.btnResetMainPage.Name = "btnResetMainPage";
+            this.btnResetMainPage.Size = new System.Drawing.Size(95, 52);
+            this.btnResetMainPage.TabIndex = 5;
+            this.btnResetMainPage.Text = "Reset";
+            this.btnResetMainPage.UseVisualStyleBackColor = false;
+            this.btnResetMainPage.Click += new System.EventHandler(this.btnResetMainPage_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -201,6 +216,7 @@
         private System.Windows.Forms.Button btnSaveToCsv;
         private System.Windows.Forms.Button btnSaveToServer;
         private System.Windows.Forms.SplitContainer splitContainer2;
+        private System.Windows.Forms.Button btnResetMainPage;
     }
 }
 

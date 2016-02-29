@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("template-reader")]
+[assembly: AssemblyTitle("Jhpiego Data Manager")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("KACE")]
-[assembly: AssemblyProduct("template-reader")]
-[assembly: AssemblyCopyright("Copyright © KACE 2015")]
+[assembly: AssemblyProduct("Jhpiego Data Manager")]
+[assembly: AssemblyCopyright("Copyright © Makando 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

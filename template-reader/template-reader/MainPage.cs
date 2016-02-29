@@ -72,11 +72,15 @@ namespace template_reader
                         if (dataGridView1.InvokeRequired)
                         {
                             dataGridView1.Invoke(
-                                new refreshDisplay((s) => { dataGridView1.DataSource = s.Tables[0]; }),
+                                new refreshDisplay((s) => {
+                                    ShowGridDisplayPort(s.Tables[0]);
+                                    //dataGridView1.DataSource = s.Tables[0];
+                                }),
                                 valuesDataset);
                             return;
                         }
-                        dataGridView1.DataSource = q.ToDataset().Tables[0];
+                        ShowGridDisplayPort(q.ToDataset().Tables[0]);
+                        //dataGridView1.DataSource = q.ToDataset().Tables[0];
                     }
                 };
                 _runner.Execute();
@@ -152,13 +156,16 @@ namespace template_reader
                 dataMerge.Execute();
 
                 EnableSaveButtons(false);
+                lblSelectedFile.Text = "No file selected";
+
                 //and show the confirmatin that the file has been saved
                 //perhaps show a tick
                 //MessageBox.Show("Merge completed");
 
 
                 //we clear the grid
-                dataGridView1.DataSource = "";
+                ShowGridDisplayPort(null);
+                //dataGridView1.DataSource = "";
             }
             else
             {
@@ -180,11 +187,40 @@ namespace template_reader
                 //we set the appropriate settings to show this project
                 Text += string.Format("  ({0})", projectSelector.SelectedProject.ToString().Replace('_', ' '));
                 this.Visible = true;
+
+                DisplayMainPage();
             }
             else
             {
                 Application.Exit();
             }
+        }
+
+        private void DisplayMainPage()
+        {
+
+        }
+
+        private void ShowGridDisplayPort(object dataSource = null)
+        {
+            if (dataSource == null)
+            {
+                EnableSaveButtons(false);
+                dataGridView1.DataSource = "";
+                DisplayMainPage();
+            }
+            else
+            {
+                dataGridView1.DataSource = dataSource;
+            }
+        }
+
+        private void btnResetMainPage_Click(object sender, EventArgs e)
+        {
+            ShowGridDisplayPort(null);
+            lblSelectedFile.Text = "No file selected";
+
+            //DisplayMainPage();
         }
     }
 }
